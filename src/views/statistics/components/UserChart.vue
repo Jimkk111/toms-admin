@@ -2,14 +2,14 @@
   <div class="container">
     <h2 class="homeTitle">用户统计</h2>
     <div class="charBox">
-      <BaseChart
-        :option="option"
-        height="320px"
-      />
       <ul class="orderListLine">
         <li class="one"><span />总用户量（个）</li>
         <li class="three"><span />新增用户（个）</li>
       </ul>
+      <BaseChart
+        :option="option"
+        height="320px"
+      />
     </div>
   </div>
 </template>

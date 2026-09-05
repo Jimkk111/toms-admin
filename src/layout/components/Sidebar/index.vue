@@ -1,5 +1,8 @@
 <template>
-  <div class="sidebar">
+  <div
+    class="sidebar"
+    :class="{ collapsed }"
+  >
     <div class="logo">
       <img
         src="@/assets/login/icon_logo.png"
@@ -59,6 +62,11 @@ const handleSelect = (key: string) => {
   height: 100%;
   width: 190px;
   background-color: #343744;
+  overflow: hidden;
+
+  &.collapsed {
+    width: 64px;
+  }
 
   .logo {
     flex-shrink: 0;
@@ -71,8 +79,12 @@ const handleSelect = (key: string) => {
 
     img {
       width: 110px;
-      display: inline-block;
+      transition: width 0.28s;
     }
+  }
+
+  &.collapsed .logo img {
+    width: 36px;
   }
 
   .menu-scroll {

@@ -2,13 +2,13 @@
   <div class="container">
     <h2 class="homeTitle">营业额统计</h2>
     <div class="charBox">
+      <ul class="orderListLine turnover">
+        <li>营业额(元)</li>
+      </ul>
       <BaseChart
         :option="option"
         height="320px"
       />
-      <ul class="orderListLine turnover">
-        <li>营业额(元)</li>
-      </ul>
     </div>
   </div>
 </template>

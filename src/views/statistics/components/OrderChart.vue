@@ -18,14 +18,14 @@
           <p>{{ orderdata.totalOrderCount }}</p>
         </div>
       </div>
-      <BaseChart
-        :option="option"
-        height="300px"
-      />
       <ul class="orderListLine">
         <li class="one"><span />订单总数（个）</li>
         <li class="three"><span />有效订单（个）</li>
       </ul>
+      <BaseChart
+        :option="option"
+        height="300px"
+      />
     </div>
   </div>
 </template>
