@@ -61,6 +61,9 @@ export default defineConfig(({ mode }) => {
           // Vite 8（Rolldown）仅支持函数形式
           manualChunks(id: string) {
             if (!id.includes('node_modules')) return undefined
+            if (/node_modules\/(echarts|zrender)\//.test(id)) {
+              return 'echarts'
+            }
             if (
               /node_modules\/(naive-ui|@css-render|css-render|vueuc|seemly|treemate|vooks|vdirs|date-fns)\//.test(
                 id,
