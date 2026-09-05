@@ -10,8 +10,7 @@
                :on-success="handleAvatarSuccess"
                :on-remove="handleRemove"
                :on-error="handleError"
-               :before-upload="beforeAvatarUpload"
-               :headers="headers">
+               :before-upload="beforeAvatarUpload">
       <img v-if="imageUrl"
            :src="imageUrl"
            class="avatar">
@@ -36,7 +35,6 @@
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
 import { baseUrl } from '@/config.json'
-import { getToken } from '@/utils/cookies'
 @Component({
   name: 'UploadImage'
 })
@@ -45,9 +43,6 @@ export default class extends Vue {
   @Prop({ default: 2 }) size: number
   @Prop({ default: '' }) propImageUrl: string
 
-  private headers = {
-    token: getToken()
-  }
   private imageUrl = ''
   handleRemove() {}
 

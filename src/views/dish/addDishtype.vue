@@ -135,7 +135,6 @@ import {
   commonDownload
 } from '@/api/dish'
 import { baseUrl } from '@/config.json'
-import { getToken } from '@/utils/cookies'
 @Component({
   name: 'addShop',
   components: {
@@ -157,9 +156,6 @@ export default class extends Vue {
   private vueRest = '1'
   private index = 0
   private inputStyle = { flex: 1 }
-  private headers = {
-    token: getToken()
-  }
   private ruleForm = {
     name: '',
     id: '',

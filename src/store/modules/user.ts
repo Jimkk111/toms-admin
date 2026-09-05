@@ -1,11 +1,10 @@
 import { VuexModule, Module, Action, Mutation, getModule } from 'vuex-module-decorators'
 import { login,userLogout } from '@/api/employee'
-import { getToken, setToken, removeToken,getStoreId, setStoreId, removeStoreId, setUserInfo, getUserInfo, removeUserInfo } from '@/utils/cookies'
+import { getStoreId, setStoreId, setUserInfo, getUserInfo, removeUserInfo } from '@/utils/cookies'
 import store from '@/store'
 import Cookies from 'js-cookie'
 import { Message } from 'element-ui'
 export interface IUserState {
-  token: string
   name: string
   avatar: string
   storeId: string
@@ -17,7 +16,6 @@ export interface IUserState {
 
 @Module({ 'dynamic': true, store, 'name': 'user' })
 class User extends VuexModule implements IUserState {
-  public token = getToken() || ''
   public name = ''
   public avatar = ''
   // @ts-ignore
@@ -28,11 +26,6 @@ class User extends VuexModule implements IUserState {
   public username = Cookies.get('username') || ''
 
   @Mutation
-  private SET_TOKEN(token: string) {
-    this.token = token
-  }
-
-  @Mutation
   private SET_NAME(name: string) {
     this.name = name
   }
@@ -40,16 +33,6 @@ class User extends VuexModule implements IUserState {
   @Mutation
   private SET_USERINFO(userInfo: any) {
     this.userInfo = { ...userInfo }
-  }
-
-  @Mutation
-  private SET_AVATAR(avatar: string) {
-    this.avatar = avatar
-  }
-
-  @Mutation
-  private SET_INTRODUCTION(introduction: string) {
-    this.introduction = introduction
   }
 
   @Mutation
@@ -72,17 +55,13 @@ class User extends VuexModule implements IUserState {
     username = username.trim()
     this.SET_USERNAME(username)
     Cookies.set('username', username)
+    // 清理旧版前端手动写入的 token cookie 残留；
+    // 现登录态由后端下发的 sky_admin_token cookie（HttpOnly）承载，前端无法也不需要操作它
+    Cookies.remove('token')
     const { data } = await login({ username, password })
     if (String(data.code) === '1') {
-      // const dataParams = {
-      //   // status: 200,
-      //   token: data.data.token,
-      //   // msg: '登录成功',
-      //   // ...data.data
-      //   ...data
-      // }
-      this.SET_TOKEN(data.data.token)
-      setToken(data.data.token)
+      // JWT 由后端通过 Set-Cookie 下发给浏览器，前端不接触 token 本身，
+      // 仅保留用户信息 cookie 作为客户端登录态标记（路由守卫依赖它）
       this.SET_USERINFO(data.data)
       Cookies.set('user_info', data.data)
       return data
@@ -93,51 +72,38 @@ class User extends VuexModule implements IUserState {
 
   @Action
   public ResetToken () {
-    removeToken()
-    this.SET_TOKEN('')
     this.SET_ROLES([])
+    Cookies.remove('username')
+    Cookies.remove('user_info')
+    Cookies.remove('token')
+    removeUserInfo()
   }
 
   @Action
   public async changeStore(data: any) {
-    this.SET_STOREID = data.data
-    this.SET_TOKEN(data.authorization)
+    this.SET_STOREID(data.data)
     setStoreId(data.data)
-    setToken(data.authorization)
   }
 
   @Action
   public async GetUserInfo () {
-    if (this.token === '') {
-      throw Error('GetUserInfo: token is undefined!')
-    }
-
-    const data = JSON.parse(<string>getUserInfo()) //  { roles: ['admin'], name: 'zhangsan', avatar: '/login', introduction: '' }
+    // 登录响应体只包含 { id, userName, name }，从 cookie 反解后仅恢复展示信息
+    const data = JSON.parse(<string>getUserInfo())
     if (!data) {
       throw Error('Verification failed, please Login again.')
     }
 
-    const { roles, name, avatar, introduction, applicant, storeManagerName, storeId='' } = data // data.user
-    // roles must be a non-empty array
-    if (!roles || roles.length <= 0) {
-      throw Error('GetUserInfo: roles must be a non-null array!')
-    }
-
-    this.SET_ROLES(roles)
     this.SET_USERINFO(data)
-    this.SET_NAME(name || applicant || storeManagerName)
-    this.SET_AVATAR(avatar)
-    this.SET_INTRODUCTION(introduction)
+    this.SET_NAME(data.name || data.userName)
   }
 
   @Action
   public async LogOut () {
+    // 后端登出接口通过 Set-Cookie: sky_admin_token=; Max-Age=0 清除 JWT cookie
     const { data } = await userLogout({})
-    removeToken()
-    this.SET_TOKEN('')
-    this.SET_ROLES([])
     Cookies.remove('username')
     Cookies.remove('user_info')
+    Cookies.remove('token')
     removeUserInfo()
   }
 }

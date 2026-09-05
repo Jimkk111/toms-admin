@@ -1,6 +1,5 @@
 import axios, { AxiosAdapter } from 'axios'
 import { Message, MessageBox } from 'element-ui'
-import { UserModule } from '@/store/modules/user'
 import {
   getRequestKey,
   pending,
@@ -12,7 +11,9 @@ const CancelToken = axios.CancelToken;
 
 const service = axios.create({
   baseURL: process.env.VUE_APP_BASE_API,
-  'timeout': 600000
+  'timeout': 600000,
+  // 登录态由后端通过 Set-Cookie 下发的 JWT 承载，请求需携带 cookie
+  'withCredentials': true
 })
 
 // Request interceptors
@@ -20,13 +21,6 @@ service.interceptors.request.use(
   (config: any) => {
     // console.log(config, 'config')
     // config.data = config.params
-    // Add X-Access-Token header to every request, you can add other custom headers here
-    if (UserModule.token) {
-      config.headers['token'] = UserModule.token
-    } else if (UserModule.token && config.url != '/login') {
-      window.location.href = '/login'
-      return false
-    }
 
     // config.headers['Access-Control-Allow-Origin'] = '*'
     // config.headers['Content-Type'] = 'application/json;'

@@ -1,17 +1,6 @@
 import Vue from "vue";
 import Router from "vue-router";
 import Layout from "@/layout/index.vue";
-import {
-  getToken,
-  setToken,
-  removeToken,
-  getStoreId,
-  setStoreId,
-  removeStoreId,
-  setUserInfo,
-  getUserInfo,
-  removeUserInfo
-} from "@/utils/cookies";
 import store from "@/store";
 
 Vue.use(Router);
