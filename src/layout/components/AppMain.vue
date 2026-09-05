@@ -16,6 +16,6 @@ defineOptions({ name: 'AppMain' })
 .app-main {
   flex: 1;
   overflow-y: auto;
-  padding: 0 20px 20px;
+  padding: 15px 20px 20px;
 }
 </style>

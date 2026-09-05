@@ -19,6 +19,12 @@ html {
   height: 100%;
 }
 
+/* n-config-provider 在 #app 与页面根元素之间渲染包裹层，
+   不补高度会打断 100% 高度链，导致布局塌缩成内容高度 */
+.n-config-provider {
+  height: 100%;
+}
+
 *,
 *::before,
 *::after {

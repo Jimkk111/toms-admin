@@ -17,7 +17,7 @@ import AppMain from './components/AppMain.vue'
 <style lang="scss" scoped>
 .app-wrapper {
   display: flex;
-  height: 100%;
+  height: 100vh;
   width: 100%;
   min-width: 1366px;
   overflow: hidden;

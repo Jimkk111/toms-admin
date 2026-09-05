@@ -77,6 +77,7 @@ const handleSelect = (key: string) => {
 
   .menu-scroll {
     flex: 1;
+    min-height: 0;
   }
 
   :deep(.n-menu) {
