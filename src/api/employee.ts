@@ -57,7 +57,7 @@ export const editEmployee = (params: any) => {
 // 修改页面反查详情接口
 export const queryEmployeeById = (id: string | (string | null)[]) => {
   return request({
-    url: `/employee/${id}`,
+    url: `/employee/detail/${id}`,
     method: 'get'
   })
 }
