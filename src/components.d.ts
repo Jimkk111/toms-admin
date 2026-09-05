@@ -13,11 +13,13 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     Breadcrumb: typeof import('./components/Breadcrumb/index.vue')['default']
+    Empty: typeof import('./components/Empty/index.vue')['default']
     Hamburger: typeof import('./components/Hamburger/index.vue')['default']
     HeadLable: typeof import('./components/HeadLable/index.vue')['default']
     NButton: typeof import('naive-ui')['NButton']
     NCard: typeof import('naive-ui')['NCard']
     NConfigProvider: typeof import('naive-ui')['NConfigProvider']
+    NDataTable: typeof import('naive-ui')['NDataTable']
     NDialogProvider: typeof import('naive-ui')['NDialogProvider']
     NDropdown: typeof import('naive-ui')['NDropdown']
     NForm: typeof import('naive-ui')['NForm']
@@ -31,6 +33,7 @@ declare module 'vue' {
     NRadioGroup: typeof import('naive-ui')['NRadioGroup']
     NResult: typeof import('naive-ui')['NResult']
     NScrollbar: typeof import('naive-ui')['NScrollbar']
+    NSelect: typeof import('naive-ui')['NSelect']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SvgIcon: typeof import('./components/SvgIcon/index.vue')['default']
@@ -40,11 +43,13 @@ declare module 'vue' {
 // For TSX support
 declare global {
   const Breadcrumb: typeof import('./components/Breadcrumb/index.vue')['default']
+  const Empty: typeof import('./components/Empty/index.vue')['default']
   const Hamburger: typeof import('./components/Hamburger/index.vue')['default']
   const HeadLable: typeof import('./components/HeadLable/index.vue')['default']
   const NButton: typeof import('naive-ui')['NButton']
   const NCard: typeof import('naive-ui')['NCard']
   const NConfigProvider: typeof import('naive-ui')['NConfigProvider']
+  const NDataTable: typeof import('naive-ui')['NDataTable']
   const NDialogProvider: typeof import('naive-ui')['NDialogProvider']
   const NDropdown: typeof import('naive-ui')['NDropdown']
   const NForm: typeof import('naive-ui')['NForm']
@@ -58,6 +63,7 @@ declare global {
   const NRadioGroup: typeof import('naive-ui')['NRadioGroup']
   const NResult: typeof import('naive-ui')['NResult']
   const NScrollbar: typeof import('naive-ui')['NScrollbar']
+  const NSelect: typeof import('naive-ui')['NSelect']
   const RouterLink: typeof import('vue-router')['RouterLink']
   const RouterView: typeof import('vue-router')['RouterView']
   const SvgIcon: typeof import('./components/SvgIcon/index.vue')['default']

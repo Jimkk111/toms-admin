@@ -36,3 +36,42 @@ a:hover {
 .blue-bug {
   color: #419eff !important;
 }
+
+/* 列表页通用样式 */
+.container {
+  background: #fff;
+  position: relative;
+  z-index: 1;
+  padding: 25px 25px 20px;
+  border-radius: 4px;
+}
+
+.tableBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.tableColumn-status {
+  color: #00a35c;
+  font-weight: 700;
+
+  &.stop-use {
+    color: #f56c6c;
+  }
+}
+
+.blueBug {
+  color: #419eff !important;
+}
+
+.delBut {
+  color: #f56c6c !important;
+}
+
+.disabled-text {
+  color: #bac0cd !important;
+}
