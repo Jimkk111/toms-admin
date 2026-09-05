@@ -5,7 +5,15 @@
   >
     <div class="logo">
       <img
+        v-if="!collapsed"
+        class="logo-full"
         src="@/assets/login/icon_logo.png"
+        alt="苍穹外卖"
+      />
+      <img
+        v-else
+        class="logo-mini"
+        src="@/assets/login/mini-logo.png"
         alt="苍穹外卖"
       />
     </div>
@@ -77,14 +85,14 @@ const handleSelect = (key: string) => {
     align-items: center;
     justify-content: center;
 
-    img {
+    /* 两个状态各自固定尺寸，不做缩放动画 */
+    .logo-full {
       width: 110px;
-      transition: width 0.28s;
     }
-  }
 
-  &.collapsed .logo img {
-    width: 36px;
+    .logo-mini {
+      width: 32px;
+    }
   }
 
   .menu-scroll {
