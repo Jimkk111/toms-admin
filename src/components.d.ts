@@ -12,6 +12,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    BaseChart: typeof import('./components/BaseChart/index.vue')['default']
     Breadcrumb: typeof import('./components/Breadcrumb/index.vue')['default']
     Empty: typeof import('./components/Empty/index.vue')['default']
     Hamburger: typeof import('./components/Hamburger/index.vue')['default']
@@ -19,7 +20,6 @@ declare module 'vue' {
     ImgUpload: typeof import('./components/ImgUpload/index.vue')['default']
     NBadge: typeof import('naive-ui')['NBadge']
     NButton: typeof import('naive-ui')['NButton']
-    NCard: typeof import('naive-ui')['NCard']
     NCheckbox: typeof import('naive-ui')['NCheckbox']
     NCheckboxGroup: typeof import('naive-ui')['NCheckboxGroup']
     NConfigProvider: typeof import('naive-ui')['NConfigProvider']
@@ -48,6 +48,7 @@ declare module 'vue' {
 
 // For TSX support
 declare global {
+  const BaseChart: typeof import('./components/BaseChart/index.vue')['default']
   const Breadcrumb: typeof import('./components/Breadcrumb/index.vue')['default']
   const Empty: typeof import('./components/Empty/index.vue')['default']
   const Hamburger: typeof import('./components/Hamburger/index.vue')['default']
@@ -55,7 +56,6 @@ declare global {
   const ImgUpload: typeof import('./components/ImgUpload/index.vue')['default']
   const NBadge: typeof import('naive-ui')['NBadge']
   const NButton: typeof import('naive-ui')['NButton']
-  const NCard: typeof import('naive-ui')['NCard']
   const NCheckbox: typeof import('naive-ui')['NCheckbox']
   const NCheckboxGroup: typeof import('naive-ui')['NCheckboxGroup']
   const NConfigProvider: typeof import('naive-ui')['NConfigProvider']

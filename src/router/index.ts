@@ -6,6 +6,7 @@ import employeeRoutes from './modules/employee'
 import dishRoutes from './modules/dish'
 import setmealRoutes from './modules/setmeal'
 import orderRoutes from './modules/order'
+import statisticsRoutes from './modules/statistics'
 
 // 与旧版约定一致：title 标题/侧边栏文案、icon（iconfont 类名）、hidden 不进侧边栏、
 // notNeedAuth 免登录页、affix 固定页签
@@ -31,6 +32,7 @@ export const constantRoutes: RouteRecordRaw[] = [
       ...dishRoutes,
       ...setmealRoutes,
       ...orderRoutes,
+      ...statisticsRoutes,
     ],
   },
   {
