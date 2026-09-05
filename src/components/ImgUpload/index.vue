@@ -48,7 +48,7 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import type { UploadCustomRequestOptions, UploadFileInfo } from 'naive-ui'
+import type { UploadFileInfo } from 'naive-ui'
 import { message } from '@/utils/feedback'
 
 const props = withDefaults(
@@ -73,7 +73,7 @@ watch(
   },
 )
 
-const beforeUpload = async ({ file }: UploadCustomRequestOptions) => {
+const beforeUpload = async ({ file }: { file: Required<UploadFileInfo>; fileList: Required<UploadFileInfo>[] }) => {
   const raw = file.file
   if (!raw) return false
   if (raw.size / 1024 / 1024 >= props.size) {
@@ -83,7 +83,7 @@ const beforeUpload = async ({ file }: UploadCustomRequestOptions) => {
   return true
 }
 
-const onFinish = ({ file }: { file: UploadFileInfo; event: ProgressEvent }) => {
+const onFinish = ({ file }: { file: UploadFileInfo; event?: unknown }) => {
   // 后端返回 { code, msg, data: 图片地址 }；naive 类型未声明 response，这里断言
   const response = (file as unknown as { response?: { code?: number; data?: string } }).response
   if (response?.data) {
