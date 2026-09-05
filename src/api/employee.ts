@@ -21,9 +21,9 @@ export const login = (data: any) =>
 
 export const getEmployeeList = (params: any) => {
   return request({
-    url: '/employee/page',
-    method: 'get',
-    params
+    url: '/employee/list',
+    method: 'post',
+    data: { ...params }
   })
 }
 
