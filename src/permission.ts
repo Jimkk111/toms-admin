@@ -1,29 +1,22 @@
 import router from './router'
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
-import { Message } from 'element-ui'
-import { Route } from 'vue-router'
-import { UserModule } from '@/store/modules/user'
-import Cookies from 'js-cookie'
+import { getUserInfo } from '@/utils/cookies'
 
-NProgress.configure({ 'showSpinner': false })
+NProgress.configure({ showSpinner: false })
 
-router.beforeEach(async (to: Route, _: Route, next: any) => {
+router.beforeEach((to, _from, next) => {
   NProgress.start()
-  // JWT 由后端 Set-Cookie 写入（可能为 HttpOnly，JS 无法读取），
+  // JWT 由后端 Set-Cookie 写入（HttpOnly，JS 无法读取），浏览器请求时自动携带；
   // 因此用登录成功时写入的 user_info cookie 作为客户端登录态标记
-  if (Cookies.get('user_info')) {
+  if (getUserInfo() || to.meta.notNeedAuth) {
     next()
   } else {
-    if (!to.meta.notNeedAuth) {
-      next('/login')
-    } else {
-      next()
-    }
+    next('/login')
   }
 })
 
-router.afterEach((to: Route) => {
+router.afterEach((to) => {
   NProgress.done()
-  document.title = to.meta.title
+  document.title = to.meta.title ?? '苍穹外卖'
 })

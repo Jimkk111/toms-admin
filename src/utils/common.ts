@@ -1,40 +1,27 @@
-export const checkProcessEnv =() => {
-  return process.env.VUE_APP_DELETE_PERMISSIONS==='true'
-}
-export const debounce=(fn, time)=> {
-  time = time || 200
-  // 定时器
-  let timer = null
-  return function(...args) {
-    var _this = this
-    if (timer) {
-      clearTimeout(timer)
-    }
-    timer = setTimeout(function() {
+/** 是否有删除权限（构建期由 VITE_DELETE_PERMISSIONS 注入） */
+export const checkDeletePermission = () => import.meta.env.VITE_DELETE_PERMISSIONS === 'true'
+
+export const debounce = <T extends (...args: never[]) => void>(fn: T, time = 200) => {
+  let timer: ReturnType<typeof setTimeout> | null = null
+  return function (this: unknown, ...args: Parameters<T>) {
+    if (timer) clearTimeout(timer)
+    timer = setTimeout(() => {
       timer = null
-      fn.apply(_this, args)
+      fn.apply(this, args)
     }, time)
   }
-  
-};
-//节流
-export const throttle = (fn, time)=> {
-  let timer = null
-  time = time || 1000
-  return function(...args) {
-    if (timer) {
-      return
-    }
-    const _this = this
+}
+
+export const throttle = <T extends (...args: never[]) => void>(fn: T, time = 1000) => {
+  let timer: ReturnType<typeof setTimeout> | null = null
+  return function (this: unknown, ...args: Parameters<T>) {
+    if (timer) return
     timer = setTimeout(() => {
       timer = null
     }, time)
-    fn.apply(_this, args)
+    fn.apply(this, args)
   }
 }
-// 判断正、负
-export const strIncrease = (str)=>{
-  if(str.slice(0,1) ==='-'){
-    return true
-    }
-}
+
+/** 判断数字字符串是否为负数 */
+export const strIncrease = (str: string) => str.slice(0, 1) === '-'

@@ -1,162 +1,94 @@
 <template>
-  <div>
+  <div class="sidebar">
     <div class="logo">
-      <!-- <img
-        src="./../../../assets/logo.png"
-        width="122.5"
-        alt=""
-      > -->
-      <!-- <img
-        src="@/assets/login/login-logo.png"
-        alt=""
-        style="width: 120px; height: 31px"
-      /> -->
-      <div v-if="!isCollapse"
-           class="sidebar-logo">
-        <img src="@/assets/login/logo.png"
-             style="width: 120px; height: 31px">
-      </div>
-      <div v-else
-           class="sidebar-logo-mini">
-        <img src="@/assets/login/mini-logo.png">
-      </div>
+      <img
+        src="@/assets/login/icon_logo.png"
+        alt="苍穹外卖"
+      />
     </div>
-    <el-scrollbar wrap-class="scrollbar-wrapper">
-      <el-menu :default-openeds="defOpen"
-               :default-active="defAct"
-               :collapse="isCollapse"
-               :background-color="variables.menuBg"
-               :text-color="variables.menuText"
-               :active-text-color="variables.menuActiveText"
-               :unique-opened="false"
-               :collapse-transition="false"
-               mode="vertical">
-        <sidebar-item v-for="route in routes"
-                      :key="route.path"
-                      :item="route"
-                      :base-path="route.path"
-                      :is-collapse="isCollapse" />
-        <!-- <div class="sub-menu">
-          <div class="avatarName">
-            {{ name }}
-          </div>
-          <div class="img">
-            <img
-              src="./../../../assets/icons/btn_close@2x.png"
-              class="outLogin"
-              alt="退出"
-              @click="logout"
-            />
-          </div>
-        </div> -->
-      </el-menu>
-    </el-scrollbar>
+    <n-scrollbar class="menu-scroll">
+      <n-menu
+        :value="activeKey"
+        :options="menuOptions"
+        :collapsed="collapsed"
+        :collapsed-width="64"
+        :collapsed-icon-size="20"
+        :indent="24"
+        :inverted="true"
+        @update:value="handleSelect"
+      />
+    </n-scrollbar>
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator'
-import { AppModule } from '@/store/modules/app'
-import { UserModule } from '@/store/modules/user'
-import SidebarItem from './SidebarItem.vue'
-import variables from '@/styles/_variables.scss'
-import { getSidebarStatus, setSidebarStatus } from '@/utils/cookies'
-import Cookies from 'js-cookie'
-@Component({
-  name: 'SideBar',
-  components: {
-    SidebarItem
-  }
-})
-export default class extends Vue {
-  private restKey: number = 0
-  get name() {
-    return (UserModule.userInfo as any).name
-      ? (UserModule.userInfo as any).name
-      : JSON.parse(Cookies.get('user_info') as any).name
-  }
-  get defOpen() {
-    // const urlArr = this.$route.path.split('/')
-    // const openStr = urlArr.length > 2 ? `/${urlArr[1]}` : '/'
-    let path = ['/']
-    this.routes.forEach((n: any, i: number) => {
-      if (n.meta.roles && n.meta.roles[0] === this.roles[0]) {
-        path.splice(0, 1, n.path)
-      }
-    })
-    return path
-  }
+<script setup lang="ts">
+import { computed, h } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import type { MenuOption } from 'naive-ui'
+import { useAppStore } from '@/stores/app'
 
-  get defAct() {
-    let path = this.$route.path
-    return path
-  }
+const route = useRoute()
+const router = useRouter()
+const appStore = useAppStore()
 
-  get sidebar() {
-    return AppModule.sidebar
-  }
+const collapsed = computed(() => !appStore.sidebarOpened)
+const activeKey = computed(() => route.path)
 
-  get roles() {
-    return UserModule.roles
-  }
-
-  get routes() {
-    let routes = JSON.parse(
-      JSON.stringify([...(this.$router as any).options.routes])
-    )
-    console.log('-=-=routes=-=-=', routes)
-    console.log('-=-=routes=-=-=', this.roles[0])
-    let menuList = []
-    let menu = routes.find(item => item.path === '/')
-    if (menu) {
-      menuList = menu.children
+const menuOptions: MenuOption[] = (
+  router.options.routes.find((r) => r.path === '/')?.children ?? []
+)
+  .filter((r) => !r.meta?.hidden)
+  .map((r) => {
+    const icon = r.meta?.icon
+    return {
+      key: `/${r.path}`.replace(/\/+/g, '/'),
+      label: r.meta?.title ?? '',
+      icon: icon ? () => h('i', { class: ['iconfont', icon] }) : undefined,
     }
-    console.log('-=-=routes=-wwww=-=', routes)
-    return menuList
-  }
+  })
 
-  get variables() {
-    return variables
-  }
-
-  get isCollapse() {
-    return !this.sidebar.opened
-  }
-  private async logout() {
-    this.$store.dispatch('LogOut').then(() => {
-      // location.href = '/'
-      this.$router.replace({ path: '/login' })
-    })
-    // this.$router.push(`/login?redirect=${this.$route.fullPath}`)
-  }
+const handleSelect = (key: string) => {
+  router.push(key).catch(() => {})
 }
 </script>
 
 <style lang="scss" scoped>
-.logo {
-  text-align: center;
-  background-color: #ffc100;
-  padding: 15px 0 0;
-  height: 60px;
-  img {
-    display: inline-block;
-  }
-}
-.sidebar-logo-mini {
-  img {
-    width: 30px;
-    height: 30px;
-  }
-}
-.el-scrollbar {
+.sidebar {
+  display: flex;
+  flex-direction: column;
   height: 100%;
-  background-color: rgb(52, 55, 68);
-}
+  width: 190px;
+  background-color: #343744;
 
-.el-menu {
-  border: none;
-  height: calc(95vh - 23px);
-  width: 100% !important;
-  padding: 47px 15px 0;
+  .logo {
+    flex-shrink: 0;
+    text-align: center;
+    background-color: #ffc100;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    img {
+      width: 110px;
+      display: inline-block;
+    }
+  }
+
+  .menu-scroll {
+    flex: 1;
+  }
+
+  :deep(.n-menu) {
+    padding: 20px 0;
+  }
+
+  :deep(.n-menu.inverted .n-menu-item-content--selected) {
+    color: #ffc200;
+
+    .iconfont {
+      color: #ffc200;
+    }
+  }
 }
 </style>

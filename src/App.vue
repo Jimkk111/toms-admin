@@ -1,14 +1,25 @@
 <template>
-  <div id="app">
-    <router-view />
-  </div>
+  <n-config-provider :theme-overrides="themeOverrides">
+    <n-notification-provider>
+      <n-dialog-provider>
+        <n-message-provider>
+          <router-view />
+        </n-message-provider>
+      </n-dialog-provider>
+    </n-notification-provider>
+  </n-config-provider>
 </template>
 
-<script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+<script setup lang="ts">
+import type { GlobalThemeOverrides } from 'naive-ui'
 
-@Component({
-  name: 'App',
-})
-export default class extends Vue {}
+// 品牌主色：苍穹外卖黄
+const themeOverrides: GlobalThemeOverrides = {
+  common: {
+    primaryColor: '#ffc200',
+    primaryColorHover: '#ffd15c',
+    primaryColorPressed: '#e6ae00',
+    primaryColorSuppl: '#ffc200',
+  },
+}
 </script>

@@ -1,0 +1,21 @@
+/* 全局 SCSS 变量（vite.config.ts additionalData 自动注入） */
+
+// 品牌色
+$primary: #ffc200;
+$sidebar-bg: #343744;
+$navbar-bg: #ffc100;
+$content-bg: #f3f4f7;
+
+// 灰阶
+$gray-1: #20232a;
+$gray-2: #818693;
+$gray-3: #bac0cd;
+$gray-4: #d8dde3;
+$gray-5: #f3f4f7;
+$gray-6: #ebeef5;
+$bg-color: #fafafb;
+
+// 侧边栏
+$side-bar-width: 190px;
+$menu-text: #bfcbd9;
+$menu-active-text: $primary;
