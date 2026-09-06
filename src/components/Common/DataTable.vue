@@ -6,7 +6,19 @@
     :loading="isRemote && loading"
     :pagination="isRemote ? pagination : undefined"
     v-bind="$attrs"
-  />
+  >
+    <!-- 透传所有插槽（empty、summary 等）给 n-data-table -->
+    <template
+      v-for="(_, name) in $slots"
+      :key="name"
+      #[name]="slotProps"
+    >
+      <slot
+        :name="name"
+        v-bind="slotProps ?? {}"
+      />
+    </template>
+  </n-data-table>
 </template>
 
 <script setup lang="ts" generic="T extends Record<string, unknown>">
@@ -79,9 +91,9 @@ const fetchData = async () => {
 
 /** 查询；resetPage 为 true 时回到第 1 页（筛选条件变化时用） */
 const search = (resetPage = false) => {
-  if (!isRemote.value) return
+  if (!isRemote.value) return Promise.resolve()
   if (resetPage) page.value = 1
-  fetchData()
+  return fetchData()
 }
 
 const handlePageChange = (newPage: number) => {
@@ -107,5 +119,5 @@ onMounted(() => {
   if (isRemote.value && props.immediate) fetchData()
 })
 
-defineExpose({ search })
+defineExpose({ search, tableData })
 </script>

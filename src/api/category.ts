@@ -1,7 +1,7 @@
 import request from '@/utils/request'
 import type { ApiResponse, PageData } from '@/types/api'
 
-export interface CategoryItem {
+export type CategoryItem = {
   id: number
   name: string
   type: string | number

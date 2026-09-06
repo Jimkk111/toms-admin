@@ -1,7 +1,7 @@
 import request from '@/utils/request'
 import type { ApiResponse, PageData } from '@/types/api'
 
-export interface DishItem {
+export type DishItem = {
   id: number
   name: string
   image: string

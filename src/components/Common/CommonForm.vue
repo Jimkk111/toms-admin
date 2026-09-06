@@ -24,7 +24,9 @@
           :value="getText(item.key)"
           :placeholder="item.placeholder ?? '请输入'"
           clearable
+          :maxlength="item.maxlength"
           :style="widthStyle(item)"
+          @keyup.enter="emit('enter')"
           @update:value="(v: string | null) => setField(item.key, v)"
         />
         <n-input
@@ -33,6 +35,7 @@
           type="password"
           :placeholder="item.placeholder ?? '请输入'"
           :style="widthStyle(item)"
+          @keyup.enter="emit('enter')"
           @update:value="(v: string | null) => setField(item.key, v)"
         />
         <n-input
@@ -41,6 +44,7 @@
           type="textarea"
           :rows="item.rows ?? 3"
           :placeholder="item.placeholder ?? '请输入'"
+          :maxlength="item.maxlength"
           :style="widthStyle(item)"
           @update:value="(v: string | null) => setField(item.key, v)"
         />
@@ -112,8 +116,10 @@ const props = withDefaults(
   },
 )
 
+const emit = defineEmits<{ enter: [] }>()
+
 // 父组件直接传 reactive 对象（:model="ruleForm"），组件写入其字段，无需 update 事件
-const model = defineModel<Record<string, unknown>>({ required: true })
+const model = defineModel<Record<string, unknown>>('model', { required: true })
 
 const formRef = ref<FormInst | null>(null)
 

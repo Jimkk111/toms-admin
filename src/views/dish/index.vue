@@ -8,8 +8,8 @@
           placeholder="请填写菜品名称"
           clearable
           style="width: 180px"
-          @clear="search(true)"
-          @keyup.enter="search(true)"
+          @clear="doSearch"
+          @keyup.enter="doSearch"
         />
 
         <span class="label">菜品分类：</span>
@@ -19,7 +19,7 @@
           clearable
           :options="dishCategoryOptions"
           style="width: 160px"
-          @clear="search(true)"
+          @clear="doSearch"
         />
 
         <span class="label">售卖状态：</span>
@@ -29,12 +29,12 @@
           clearable
           :options="saleStatusOptions"
           style="width: 140px"
-          @clear="search(true)"
+          @clear="doSearch"
         />
 
         <n-button
           class="normal-btn"
-          @click="search(true)"
+          @click="doSearch"
         >
           查询
         </n-button>
@@ -56,22 +56,19 @@
       </div>
     </div>
 
-    <n-data-table
-      v-if="tableData.length"
-      remote
-      striped
+    <DataTable
+      ref="tableRef"
       :columns="columns"
-      :data="tableData"
-      :loading="loading"
-      :pagination="pagination"
+      :req-fn="fetcher"
+      :params="queryParams"
       :row-key="(row: DishItem) => row.id"
       :checked-row-keys="checkedKeys"
       @update:checked-row-keys="handleCheck"
-    />
-    <Empty
-      v-else
-      :is-search="isSearch"
-    />
+    >
+      <template #empty>
+        <Empty :is-search="isSearch" />
+      </template>
+    </DataTable>
   </div>
 </template>
 
@@ -81,8 +78,9 @@ import { useRouter } from 'vue-router'
 import { NButton, NImage, type DataTableColumns } from 'naive-ui'
 import { getDishPage, deleteDish, dishStatusByStatus, getCategoryList } from '@/api/dish'
 import type { DishItem } from '@/api/dish'
-import { useTable } from '@/composables/useTable'
 import { message, dialog } from '@/utils/feedback'
+import DataTable from '@/components/Common/DataTable.vue'
+import type { DataTableExpose } from '@/types/components'
 import Empty from '@/components/Empty/index.vue'
 import noImg from '@/assets/noImg.png'
 
@@ -96,11 +94,22 @@ const dishStatus = ref<number | null>(null)
 const isSearch = ref(false)
 const checkedKeys = ref<Array<number | string>>([])
 const dishCategoryOptions = ref<{ label: string; value: number }[]>([])
+const queryParams = ref<Record<string, unknown>>({})
+const tableRef = ref<DataTableExpose | null>(null)
 
 const saleStatusOptions = [
   { value: 0, label: '停售' },
   { value: 1, label: '启售' },
 ]
+
+const doSearch = () => {
+  isSearch.value = true
+  queryParams.value = {
+    name: input.value || undefined,
+    categoryId: categoryId.value ?? undefined,
+    status: dishStatus.value ?? undefined,
+  }
+}
 
 async function fetcher(params: { page: number; pageSize: number }) {
   const { data } = await getDishPage({
@@ -111,9 +120,6 @@ async function fetcher(params: { page: number; pageSize: number }) {
   })
   return data.data
 }
-
-const { loading, tableData, pagination, search } = useTable<DishItem>(fetcher)
-search()
 
 onMounted(async () => {
   try {
@@ -206,7 +212,7 @@ const deleteHandle = (type: '批量' | '单删', row: DishItem | null) => {
       if (String(data.code) === '1') {
         message.success('删除成功！')
         checkedKeys.value = []
-        search()
+        tableRef.value?.search()
       } else {
         message.error(data.msg ?? '删除失败')
       }
@@ -227,7 +233,7 @@ const statusHandle = (row: DishItem) => {
       })
       if (String(data.code) === '1') {
         message.success('菜品状态已经更改成功！')
-        search()
+        tableRef.value?.search()
       } else {
         message.error(data.msg ?? '操作失败')
       }

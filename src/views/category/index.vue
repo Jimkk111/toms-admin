@@ -8,8 +8,8 @@
           placeholder="请填写分类名称"
           clearable
           style="width: 200px"
-          @clear="search(true)"
-          @keyup.enter="search(true)"
+          @clear="doSearch"
+          @keyup.enter="doSearch"
         />
 
         <span class="label">分类类型：</span>
@@ -19,10 +19,15 @@
           clearable
           :options="typeOptions"
           style="width: 160px"
-          @clear="search(true)"
+          @clear="doSearch"
         />
 
-        <n-button class="normal-btn" @click="search(true)"> 查询 </n-button>
+        <n-button
+          class="normal-btn"
+          @click="doSearch"
+        >
+          查询
+        </n-button>
       </div>
 
       <div>
@@ -42,20 +47,17 @@
       </div>
     </div>
 
-    <n-data-table
-      v-if="tableData.length"
-      remote
-      striped
+    <DataTable
+      ref="tableRef"
       :columns="columns"
-      :data="tableData"
-      :loading="loading"
-      :pagination="pagination"
+      :req-fn="fetcher"
+      :params="queryParams"
       :row-key="(row: CategoryItem) => row.id"
-    />
-    <Empty
-      v-else
-      :is-search="isSearch"
-    />
+    >
+      <template #empty>
+        <Empty :is-search="isSearch" />
+      </template>
+    </DataTable>
 
     <!-- 新增/修改分类 -->
     <n-modal
@@ -64,33 +66,11 @@
       :title="classData.title"
       style="width: 30%"
     >
-      <n-form
+      <CommonForm
         ref="formRef"
-        :model="classData"
-        :rules="rules"
-        label-placement="left"
-        label-width="100"
-      >
-        <n-form-item
-          label="分类名称："
-          path="name"
-        >
-          <n-input
-            v-model:value="classData.name"
-            placeholder="请输入分类名称"
-            :maxlength="20"
-          />
-        </n-form-item>
-        <n-form-item
-          label="排序："
-          path="sort"
-        >
-          <n-input
-            v-model:value="classData.sort"
-            placeholder="请输入排序"
-          />
-        </n-form-item>
-      </n-form>
+        :model="classForm"
+        :items="formItems"
+      />
       <template #footer>
         <div class="modal-footer">
           <n-button @click="handleClose">取 消</n-button>
@@ -115,7 +95,7 @@
 
 <script setup lang="ts">
 import { h, reactive, ref } from 'vue'
-import { NButton, type DataTableColumns, type FormInst, type FormItemRule, type SelectOption } from 'naive-ui'
+import { NButton, type DataTableColumns, type SelectOption } from 'naive-ui'
 import {
   getCategoryPage,
   deleCategory,
@@ -124,8 +104,11 @@ import {
   enableOrDisableCategory,
 } from '@/api/category'
 import type { CategoryItem } from '@/api/category'
-import { useTable } from '@/composables/useTable'
 import { message, dialog } from '@/utils/feedback'
+import DataTable from '@/components/Common/DataTable.vue'
+import type { DataTableExpose } from '@/types/components'
+import CommonForm from '@/components/Common/CommonForm.vue'
+import type { FormItemOption } from '@/types/form'
 import Empty from '@/components/Empty/index.vue'
 
 defineOptions({ name: 'Category' })
@@ -138,6 +121,17 @@ const typeOptions: SelectOption[] = [
 const name = ref('')
 const categoryType = ref<number | null>(null)
 const isSearch = ref(false)
+const queryParams = ref<Record<string, unknown>>({})
+const tableRef = ref<DataTableExpose | null>(null)
+
+// 输入框/下拉的值变化不直接查询，点查询/回车/清除时才写入 queryParams 触发重查
+const doSearch = () => {
+  isSearch.value = true
+  queryParams.value = {
+    name: name.value || undefined,
+    type: categoryType.value ?? undefined,
+  }
+}
 
 async function fetcher(params: { page: number; pageSize: number }) {
   const { data } = await getCategoryPage({
@@ -147,9 +141,6 @@ async function fetcher(params: { page: number; pageSize: number }) {
   })
   return data.data
 }
-
-const { loading, tableData, pagination, search } = useTable<CategoryItem>(fetcher)
-search()
 
 const renderActionBtn = (label: string, cls: string, onClick: () => void, disabled = false) =>
   h(
@@ -195,18 +186,20 @@ const columns: DataTableColumns<CategoryItem> = [
 ]
 
 // 新增/修改弹窗
-const formRef = ref<FormInst | null>(null)
+const formRef = ref<InstanceType<typeof CommonForm> | null>(null)
 const action = ref<'add' | 'edit'>('add')
 const type = ref('1')
 const classData = reactive({
   visible: false,
   title: '',
-  name: '',
-  sort: '',
   id: 0 as number | string,
 })
+const classForm = reactive({
+  name: '',
+  sort: '',
+})
 
-const validateName = (_rule: FormItemRule, value: string) => {
+const validateName = (_rule: unknown, value: string) => {
   const reg = /^[A-Za-z\u4e00-\u9fa5]+$/
   if (!value) return new Error(classData.title + '不能为空')
   if (value.length < 2) return new Error('分类名称输入不符，请输入2-20个字符')
@@ -214,32 +207,32 @@ const validateName = (_rule: FormItemRule, value: string) => {
   return true
 }
 
-const validateSort = (_rule: FormItemRule, value: string) => {
+const validateSort = (_rule: unknown, value: string) => {
   if (!value && String(value) !== '0') return new Error('排序不能为空')
   if (!/^\d+$/.test(value)) return new Error('排序只能输入数字类型')
   if (Number(value) > 99) return new Error('排序只能输入0-99数字')
   return true
 }
 
-const rules: Record<string, FormItemRule[]> = {
-  name: [{ required: true, validator: validateName, trigger: 'blur' }],
-  sort: [{ required: true, validator: validateSort, trigger: 'blur' }],
-}
+const formItems: FormItemOption[] = [
+  { key: 'name', label: '分类名称', required: true, width: '280px', rule: { validator: validateName, trigger: 'blur' } },
+  { key: 'sort', label: '排序', required: true, width: '280px', rule: { validator: validateSort, trigger: 'blur' } },
+]
 
 const openAdd = (t: string) => {
   type.value = t
   action.value = 'add'
   classData.title = t === '1' ? '新增菜品分类' : '新增套餐分类'
-  classData.name = ''
-  classData.sort = ''
+  classForm.name = ''
+  classForm.sort = ''
   classData.visible = true
 }
 
 const openEdit = (row: CategoryItem) => {
   action.value = 'edit'
   classData.title = '修改分类'
-  classData.name = row.name
-  classData.sort = String(row.sort)
+  classForm.name = row.name
+  classForm.sort = String(row.sort)
   classData.id = row.id
   classData.visible = true
 }
@@ -249,32 +242,29 @@ const handleClose = () => {
   formRef.value?.restoreValidation()
 }
 
-const submitForm = (st?: 'go') => {
-  formRef.value
-    ?.validate()
-    .then(async () => {
-      const { data } =
-        action.value === 'add'
-          ? await addCategory({ name: classData.name, type: type.value, sort: classData.sort })
-          : await editCategory({
-              id: Number(classData.id),
-              name: classData.name,
-              sort: classData.sort,
-            })
-      if (String(data.code) === '1') {
-        message.success(action.value === 'add' ? '分类添加成功！' : '分类修改成功！')
-        if (!st) classData.visible = false
-        if (action.value === 'add') {
-          classData.name = ''
-          classData.sort = ''
-        }
-        formRef.value?.restoreValidation()
-        search()
-      } else {
-        message.error(data.desc || data.msg || '操作失败')
-      }
-    })
-    .catch(() => {})
+const submitForm = async (st?: 'go') => {
+  const ok = await formRef.value?.validate()
+  if (!ok) return
+  const { data } =
+    action.value === 'add'
+      ? await addCategory({ name: classForm.name, type: type.value, sort: classForm.sort })
+      : await editCategory({
+          id: Number(classData.id),
+          name: classForm.name,
+          sort: classForm.sort,
+        })
+  if (String(data.code) === '1') {
+    message.success(action.value === 'add' ? '分类添加成功！' : '分类修改成功！')
+    if (!st) classData.visible = false
+    if (action.value === 'add') {
+      classForm.name = ''
+      classForm.sort = ''
+    }
+    formRef.value?.restoreValidation()
+    tableRef.value?.search()
+  } else {
+    message.error(data.desc || data.msg || '操作失败')
+  }
 }
 
 const deleteHandle = (row: CategoryItem) => {
@@ -287,7 +277,7 @@ const deleteHandle = (row: CategoryItem) => {
       const { data } = await deleCategory(row.id)
       if (String(data.code) === '1') {
         message.success('删除成功！')
-        search()
+        tableRef.value?.search()
       } else {
         message.error(data.msg ?? '删除失败')
       }
@@ -308,7 +298,7 @@ const statusHandle = (row: CategoryItem) => {
       })
       if (String(data.code) === '1') {
         message.success('分类状态更改成功！')
-        search()
+        tableRef.value?.search()
       } else {
         message.error(data.msg ?? '操作失败')
       }

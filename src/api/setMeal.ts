@@ -1,7 +1,7 @@
 import request from '@/utils/request'
 import type { ApiResponse, PageData } from '@/types/api'
 
-export interface SetmealItem {
+export type SetmealItem = {
   id: number
   name: string
   image: string
@@ -13,7 +13,7 @@ export interface SetmealItem {
   description?: string
 }
 
-export interface SetmealDish {
+export type SetmealDish = {
   dishId: number | string
   name: string
   price: number | string

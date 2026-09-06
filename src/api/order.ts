@@ -1,7 +1,7 @@
 import request from '@/utils/request'
 import type { ApiResponse, PageData } from '@/types/api'
 
-export interface OrderItem {
+export type OrderItem = {
   id: number | string
   number: string
   status: number

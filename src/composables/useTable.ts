@@ -35,11 +35,13 @@ export function useTable<T>(
     }
   }
 
+  // 切换页码后传入新的页码，重新请求数据
   function handlePageChange(p: number) {
     page.value = p
     search()
   }
 
+  // 切换每页条数后传入新的条数，重新请求数据
   function handlePageSizeChange(s: number) {
     pageSize.value = s
     search()

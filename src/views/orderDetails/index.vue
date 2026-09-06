@@ -47,21 +47,17 @@
         </n-button>
       </div>
 
-      <n-data-table
-        v-if="tableData.length"
-        remote
-        striped
+      <DataTable
+        ref="tableRef"
         :columns="columns"
-        :data="tableData"
-        :loading="loading"
-        :pagination="pagination"
+        :req-fn="fetcher"
         :row-key="(row: OrderItem) => row.id"
         :scroll-x="1200"
-      />
-      <Empty
-        v-else
-        :is-search="isSearch"
-      />
+      >
+        <template #empty>
+          <Empty :is-search="isSearch" />
+        </template>
+      </DataTable>
     </div>
 
     <!-- 查看订单信息 -->
@@ -140,11 +136,12 @@ import {
   getOrderListBy,
 } from '@/api/order'
 import type { OrderItem, OrderStatics } from '@/api/order'
-import { useTable } from '@/composables/useTable'
+import type { DataTableExpose } from '@/types/components'
 import { message } from '@/utils/feedback'
 import TabChange from './components/TabChange.vue'
 import OrderDetailModal from './components/OrderDetailModal.vue'
 import OrderCancelModal from './components/OrderCancelModal.vue'
+import DataTable from '@/components/Common/DataTable.vue'
 import Empty from '@/components/Empty/index.vue'
 
 defineOptions({ name: 'Order' })
@@ -170,6 +167,7 @@ const input = ref('')
 const phone = ref('')
 const valueTime = ref<[string, string] | null>(null)
 const isSearch = ref(false)
+const tableRef = ref<DataTableExpose | null>(null)
 
 async function fetcher(params: { page: number; pageSize: number }) {
   const { data } = await getOrderDetailPage({
@@ -182,8 +180,6 @@ async function fetcher(params: { page: number; pageSize: number }) {
   })
   return data.data
 }
-
-const { loading, tableData, pagination, search: searchTable } = useTable<OrderItem>(fetcher)
 
 const fetchStatics = async () => {
   const { data } = await getOrderListBy()
@@ -199,16 +195,17 @@ const isAutoNext = ref(true)
 const isTableOperateBtn = ref(true)
 
 const search = (resetPage = false) => {
-  searchTable(resetPage).then(() => {
+  return Promise.resolve(tableRef.value?.search(resetPage)).then(() => {
     // 弹窗内处理完当前单后，自动打开下一条待接单
+    const rows = (tableRef.value?.tableData ?? []) as OrderItem[]
     if (
       dialogOrderStatus.value === 2 &&
       orderStatus.value === 2 &&
       isAutoNext.value &&
       !isTableOperateBtn.value &&
-      tableData.value.length > 1
+      rows.length > 1
     ) {
-      const row = tableData.value[0]
+      const row = rows[0]
       goDetail(row.id, row.status, row)
     }
   })
@@ -218,7 +215,7 @@ onMounted(() => {
   const status = Number(route.query.status) || 0
   orderStatus.value = status
   defaultActivity.value = status
-  searchTable()
+  tableRef.value?.search()
   fetchStatics()
   // 消息通知跳转进来的直接打开详情
   if (route.query.orderId && route.query.orderId !== 'undefined') {

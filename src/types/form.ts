@@ -25,6 +25,8 @@ export interface FormItemOption {
   options?: SelectOption[]
   /** textarea 行数，默认 3 */
   rows?: number
+  /** 输入最大长度（input / textarea） */
+  maxlength?: number
   /** 控件宽度，默认跟随表单布局 */
   width?: string
   /** 追加/覆盖该字段的校验规则（覆盖 required 生成的默认规则） */

@@ -69,10 +69,9 @@
               >
                 + 添加菜品
               </div>
-              <n-data-table
+              <DataTable
                 :columns="dishColumns"
                 :data="dishTable"
-                :pagination="false"
                 :row-key="(row: SetmealDish) => row.dishId"
               />
             </div>

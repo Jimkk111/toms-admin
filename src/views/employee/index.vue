@@ -8,12 +8,12 @@
           placeholder="请输入员工姓名"
           clearable
           style="width: 200px"
-          @clear="search(true)"
-          @keyup.enter="search(true)"
+          @clear="doSearch"
+          @keyup.enter="doSearch"
         />
         <n-button
           class="normal-btn"
-          @click="search(true)"
+          @click="doSearch"
         >
           查询
         </n-button>
@@ -26,20 +26,17 @@
       </n-button>
     </div>
 
-    <n-data-table
-      v-if="tableData.length"
-      remote
-      striped
+    <DataTable
+      ref="tableRef"
       :columns="columns"
-      :data="tableData"
-      :loading="loading"
-      :pagination="pagination"
+      :req-fn="fetcher"
+      :params="queryParams"
       :row-key="(row: EmployeeItem) => row.id"
-    />
-    <Empty
-      v-else
-      :is-search="isSearch"
-    />
+    >
+      <template #empty>
+        <Empty :is-search="isSearch" />
+      </template>
+    </DataTable>
   </div>
 </template>
 
@@ -49,8 +46,9 @@ import { useRouter } from 'vue-router'
 import { NButton, type DataTableColumns } from 'naive-ui'
 import { getEmployeeList, enableOrDisableEmployee } from '@/api/employee'
 import type { EmployeeItem } from '@/api/employee'
-import { useTable } from '@/composables/useTable'
 import { message, dialog } from '@/utils/feedback'
+import DataTable from '@/components/Common/DataTable.vue'
+import type { DataTableExpose } from '@/types/components'
 import Empty from '@/components/Empty/index.vue'
 
 defineOptions({ name: 'Employee' })
@@ -58,6 +56,13 @@ defineOptions({ name: 'Employee' })
 const router = useRouter()
 const input = ref('')
 const isSearch = ref(false)
+const queryParams = ref<Record<string, unknown>>({})
+const tableRef = ref<DataTableExpose | null>(null)
+
+const doSearch = () => {
+  isSearch.value = true
+  queryParams.value = { name: input.value || undefined }
+}
 
 async function fetcher(params: { page: number; pageSize: number }) {
   const { data } = await getEmployeeList({
@@ -66,9 +71,6 @@ async function fetcher(params: { page: number; pageSize: number }) {
   })
   return data.data
 }
-
-const { loading, tableData, pagination, search } = useTable<EmployeeItem>(fetcher)
-search()
 
 const isAdmin = (row: EmployeeItem) => row.username === 'admin'
 
@@ -140,7 +142,7 @@ const statusHandle = (row: EmployeeItem) => {
       })
       if (String(data.code) === '1') {
         message.success('账号状态更改成功！')
-        search()
+        tableRef.value?.search()
       } else {
         message.error(data.msg ?? '操作失败')
       }

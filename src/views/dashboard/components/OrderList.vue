@@ -19,18 +19,16 @@
       </ul>
     </h2>
 
-    <n-data-table
-      v-if="tableData.length"
-      remote
-      striped
+    <DataTable
       :columns="columns"
-      :data="tableData"
-      :loading="loading"
-      :pagination="pagination"
+      :req-fn="fetcher"
       :row-key="(row: OrderItem) => row.id"
       :row-props="rowProps"
-    />
-    <Empty v-else />
+    >
+      <template #empty>
+        <Empty />
+      </template>
+    </DataTable>
 
     <!-- 查看订单信息（复用订单页弹窗） -->
     <OrderDetailModal
@@ -92,7 +90,8 @@ import {
   type OrderStatics,
 } from '@/api/order'
 import type { OrderItem } from '@/api/order'
-import { useTable } from '@/composables/useTable'
+import DataTable from '@/components/Common/DataTable.vue'
+import type { DataTableExpose } from '@/types/components'
 import { message } from '@/utils/feedback'
 import Empty from '@/components/Empty/index.vue'
 import OrderDetailModal from '@/views/orderDetails/components/OrderDetailModal.vue'
@@ -124,7 +123,11 @@ async function fetcher(params: { page: number; pageSize: number }) {
   return data.data
 }
 
-const { loading, tableData, pagination, search } = useTable<OrderItem>(fetcher)
+const tableRef = ref<DataTableExpose | null>(null)
+
+const search = (resetPage = false) => {
+  tableRef.value?.search(resetPage)
+}
 
 const fetchStatics = () => emit('refreshStatics')
 
