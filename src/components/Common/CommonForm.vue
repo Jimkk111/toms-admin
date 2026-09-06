@@ -13,6 +13,7 @@
       :key="item.key"
       :path="item.key"
       :label="item.label"
+      :show-require-mark="item.required"
     >
       <!-- 具名插槽逃生口：配置覆盖不了的复杂内容（如动态口味配置）用它 -->
       <slot
@@ -134,7 +135,8 @@ const setField = (key: string, v: unknown) => {
 
 const widthStyle = (item: FormItemOption) => (item.width ? { width: item.width } : undefined)
 
-// ---- 校验规则：required 生成默认规则，item.rule 可追加/覆盖 ----
+// ---- 校验规则：无自定义 rule 时按 required 生成默认规则；
+// 有自定义 rule 时完全信任它（自定义校验器通常已处理空值），required 仅控制必填星标 ----
 const rules = computed<Record<string, FormItemRule[]>>(() => {
   const result: Record<string, FormItemRule[]> = {}
   for (const item of props.items) {
@@ -143,7 +145,7 @@ const rules = computed<Record<string, FormItemRule[]>>(() => {
         ? [...item.rule]
         : [item.rule]
       : []
-    if (item.required && !list.some((r) => r.required)) {
+    if (item.required && !item.rule && !list.some((r) => r.required)) {
       const trigger = ['select', 'radio', 'datetimerange'].includes(item.type ?? 'input')
         ? 'change'
         : 'blur'

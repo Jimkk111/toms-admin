@@ -183,7 +183,9 @@ const items = computed<FormItemOption[]>(() => [
     options: setmealCategoryOptions.value,
     required: true,
     width: '350px',
-    rule: { required: true, message: '请选择套餐分类', trigger: 'change' },
+    // 数字下拉必须声明 type: 'number'，否则 async-validator 默认按 string 校验，
+    // 选中数字 id 后仍会报必填错误
+    rule: { required: true, type: 'number', message: '请选择套餐分类', trigger: 'change' },
   },
   {
     key: 'price',
