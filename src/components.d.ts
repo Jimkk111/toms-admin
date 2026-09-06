@@ -14,6 +14,8 @@ declare module 'vue' {
   export interface GlobalComponents {
     BaseChart: typeof import('./components/BaseChart/index.vue')['default']
     Breadcrumb: typeof import('./components/Breadcrumb/index.vue')['default']
+    CommonForm: typeof import('./components/Common/CommonForm.vue')['default']
+    DataTable: typeof import('./components/Common/DataTable.vue')['default']
     Empty: typeof import('./components/Empty/index.vue')['default']
     Hamburger: typeof import('./components/Hamburger/index.vue')['default']
     HeadLable: typeof import('./components/HeadLable/index.vue')['default']
@@ -50,6 +52,8 @@ declare module 'vue' {
 declare global {
   const BaseChart: typeof import('./components/BaseChart/index.vue')['default']
   const Breadcrumb: typeof import('./components/Breadcrumb/index.vue')['default']
+  const CommonForm: typeof import('./components/Common/CommonForm.vue')['default']
+  const DataTable: typeof import('./components/Common/DataTable.vue')['default']
   const Empty: typeof import('./components/Empty/index.vue')['default']
   const Hamburger: typeof import('./components/Hamburger/index.vue')['default']
   const HeadLable: typeof import('./components/HeadLable/index.vue')['default']
