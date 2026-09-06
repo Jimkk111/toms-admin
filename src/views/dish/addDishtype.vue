@@ -5,48 +5,13 @@
       :goback="true"
     />
     <div class="container">
-      <n-form
+      <CommonForm
         ref="formRef"
         :model="ruleForm"
-        :rules="rules"
-        label-placement="left"
+        :items="items"
         label-width="180"
       >
-        <div class="form-row">
-          <n-form-item
-            label="菜品名称:"
-            path="name"
-          >
-            <n-input
-              v-model:value="ruleForm.name"
-              placeholder="请填写菜品名称"
-              :maxlength="20"
-            />
-          </n-form-item>
-          <n-form-item
-            label="菜品分类:"
-            path="categoryId"
-          >
-            <n-select
-              v-model:value="ruleForm.categoryId"
-              placeholder="请选择菜品分类"
-              :options="dishOptions"
-            />
-          </n-form-item>
-        </div>
-        <div class="form-row">
-          <n-form-item
-            label="菜品价格:"
-            path="price"
-          >
-            <n-input
-              v-model:value="ruleForm.price"
-              placeholder="请设置菜品价格"
-            />
-          </n-form-item>
-        </div>
-
-        <n-form-item label="口味做法配置:">
+        <template #flavors>
           <div class="flavorBox">
             <span
               v-if="dishFlavors.length === 0"
@@ -102,50 +67,33 @@
               </div>
             </div>
           </div>
-        </n-form-item>
-
-        <n-form-item
-          label="菜品图片:"
-          path="image"
-        >
+        </template>
+        <template #image>
           <ImgUpload
             :prop-image-url="ruleForm.image"
             @image-change="imageChange"
           >
             图片大小不超过2M<br />仅能上传 PNG JPEG JPG类型图片<br />建议上传200*200或300*300尺寸的图片
           </ImgUpload>
-        </n-form-item>
+        </template>
+      </CommonForm>
 
-        <n-form-item
-          label="菜品描述:"
-          path="description"
+      <div class="subBox">
+        <n-button @click="router.back()">取消</n-button>
+        <n-button
+          type="primary"
+          @click="submitForm(false)"
         >
-          <n-input
-            v-model:value="ruleForm.description"
-            type="textarea"
-            :rows="3"
-            maxlength="200"
-            placeholder="菜品描述，最长200字"
-          />
-        </n-form-item>
-
-        <div class="subBox">
-          <n-button @click="router.back()">取消</n-button>
-          <n-button
-            type="primary"
-            @click="submitForm(false)"
-          >
-            保存
-          </n-button>
-          <n-button
-            v-if="actionType === 'add'"
-            type="primary"
-            @click="submitForm(true)"
-          >
-            保存并继续添加
-          </n-button>
-        </div>
-      </n-form>
+          保存
+        </n-button>
+        <n-button
+          v-if="actionType === 'add'"
+          type="primary"
+          @click="submitForm(true)"
+        >
+          保存并继续添加
+        </n-button>
+      </div>
     </div>
   </div>
 </template>
@@ -153,19 +101,21 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import type { FormInst, FormItemRule, SelectOption } from 'naive-ui'
+import type { FormItemRule, SelectOption } from 'naive-ui'
 import { queryDishById, addDish, editDish, getCategoryList } from '@/api/dish'
 import type { DishFlavor } from '@/api/dish'
 import { message } from '@/utils/feedback'
 import HeadLable from '@/components/HeadLable/index.vue'
 import ImgUpload from '@/components/ImgUpload/index.vue'
+import CommonForm from '@/components/Common/CommonForm.vue'
+import type { FormItemOption } from '@/types/form'
 
 defineOptions({ name: 'AddDishPage' })
 
 const route = useRoute()
 const router = useRouter()
 
-const formRef = ref<FormInst | null>(null)
+const formRef = ref<InstanceType<typeof CommonForm> | null>(null)
 const actionType = ref<'add' | 'edit'>('add')
 const title = ref('添加菜品')
 
@@ -213,11 +163,46 @@ const validatePrice = (_rule: FormItemRule, value: string) => {
   return true
 }
 
-const rules: Record<string, FormItemRule[]> = {
-  name: [{ required: true, validator: validateName, trigger: 'blur' }],
-  categoryId: [{ required: true, message: '请选择菜品分类', trigger: 'change' }],
-  price: [{ required: true, validator: validatePrice, trigger: 'blur' }],
-}
+const validateImage = () =>
+  ruleForm.image ? true : new Error('菜品图片不能为空')
+
+const items = computed<FormItemOption[]>(() => [
+  {
+    key: 'name',
+    label: '菜品名称:',
+    required: true,
+    width: '350px',
+    maxlength: 20,
+    rule: { validator: validateName, trigger: 'blur' },
+  },
+  {
+    key: 'categoryId',
+    label: '菜品分类:',
+    type: 'select',
+    options: dishOptions.value,
+    required: true,
+    width: '350px',
+    rule: { required: true, message: '请选择菜品分类', trigger: 'change' },
+  },
+  {
+    key: 'price',
+    label: '菜品价格:',
+    required: true,
+    width: '350px',
+    rule: { validator: validatePrice, trigger: 'blur' },
+  },
+  { key: 'flavors', label: '口味做法配置:' },
+  { key: 'image', label: '菜品图片:', rule: { validator: validateImage } },
+  {
+    key: 'description',
+    label: '菜品描述:',
+    type: 'textarea',
+    rows: 3,
+    maxlength: 200,
+    width: '777px',
+    placeholder: '菜品描述，最长200字',
+  },
+])
 
 const addFlavor = () => {
   dishFlavors.value.push({ name: '', value: [] })
@@ -279,12 +264,8 @@ onMounted(() => {
 })
 
 const submitForm = async (keepAdding: boolean) => {
-  const valid = await formRef.value?.validate().catch(() => null)
-  if (valid === null) return
-  if (!ruleForm.image) {
-    message.error('菜品图片不能为空')
-    return
-  }
+  const ok = await formRef.value?.validate()
+  if (!ok) return
 
   const params = {
     name: ruleForm.name,
@@ -314,6 +295,7 @@ const submitForm = async (keepAdding: boolean) => {
       ruleForm.price = ''
       ruleForm.image = ''
       ruleForm.description = ''
+      formRef.value?.restoreValidation()
       return
     }
     router.push('/dish')
@@ -332,21 +314,6 @@ const submitForm = async (keepAdding: boolean) => {
     padding: 30px;
     border-radius: 4px;
     min-height: 500px;
-  }
-
-  .form-row {
-    display: flex;
-    flex-wrap: wrap;
-  }
-
-  :deep(.n-input),
-  :deep(.n-base-selection),
-  :deep(.n-input--textarea) {
-    width: 350px;
-  }
-
-  :deep(.n-input--textarea .n-input__textarea-el) {
-    width: 100%;
   }
 
   .subBox {

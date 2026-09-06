@@ -5,80 +5,28 @@
       :goback="true"
     />
     <div class="container">
-      <n-form
+      <CommonForm
         ref="formRef"
         :model="ruleForm"
-        :rules="rules"
-        label-placement="left"
+        :items="items"
         label-width="180"
-      >
-        <n-form-item
-          label="账号:"
-          path="username"
+      />
+      <div class="sub-box">
+        <n-button @click="router.push('/employee')">取消</n-button>
+        <n-button
+          type="primary"
+          @click="submitForm(false)"
         >
-          <n-input
-            v-model:value="ruleForm.username"
-            placeholder="请输入账号"
-            :maxlength="20"
-          />
-        </n-form-item>
-        <n-form-item
-          label="员工姓名:"
-          path="name"
+          保存
+        </n-button>
+        <n-button
+          v-if="actionType === 'add'"
+          type="primary"
+          @click="submitForm(true)"
         >
-          <n-input
-            v-model:value="ruleForm.name"
-            placeholder="请输入员工姓名"
-            :maxlength="12"
-          />
-        </n-form-item>
-        <n-form-item
-          label="手机号:"
-          path="phone"
-        >
-          <n-input
-            v-model:value="ruleForm.phone"
-            placeholder="请输入手机号"
-            :maxlength="11"
-          />
-        </n-form-item>
-        <n-form-item
-          label="性别:"
-          path="sex"
-        >
-          <n-radio-group v-model:value="ruleForm.sex">
-            <n-radio value="男">男</n-radio>
-            <n-radio value="女">女</n-radio>
-          </n-radio-group>
-        </n-form-item>
-        <n-form-item
-          label="身份证号:"
-          path="idNumber"
-          class="id-number"
-        >
-          <n-input
-            v-model:value="ruleForm.idNumber"
-            placeholder="请输入身份证号"
-            :maxlength="20"
-          />
-        </n-form-item>
-        <div class="sub-box">
-          <n-button @click="router.push('/employee')">取消</n-button>
-          <n-button
-            type="primary"
-            @click="submitForm(false)"
-          >
-            保存
-          </n-button>
-          <n-button
-            v-if="actionType === 'add'"
-            type="primary"
-            @click="submitForm(true)"
-          >
-            保存并继续添加
-          </n-button>
-        </div>
-      </n-form>
+          保存并继续添加
+        </n-button>
+      </div>
     </div>
   </div>
 </template>
@@ -86,18 +34,20 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import type { FormInst, FormItemRule } from 'naive-ui'
+import type { FormItemRule } from 'naive-ui'
 import { queryEmployeeById, addEmployee, editEmployee } from '@/api/employee'
 import type { EmployeeForm } from '@/api/employee'
 import { message } from '@/utils/feedback'
 import HeadLable from '@/components/HeadLable/index.vue'
+import CommonForm from '@/components/Common/CommonForm.vue'
+import type { FormItemOption } from '@/types/form'
 
 defineOptions({ name: 'AddEmployee' })
 
 const route = useRoute()
 const router = useRouter()
 
-const formRef = ref<FormInst | null>(null)
+const formRef = ref<InstanceType<typeof CommonForm> | null>(null)
 const actionType = ref<'add' | 'edit'>('add')
 const title = ref('添加员工')
 
@@ -130,12 +80,42 @@ const validateIdNumber = (_rule: FormItemRule, value: string) => {
   return true
 }
 
-const rules: Record<string, FormItemRule[]> = {
-  username: [{ required: true, validator: validateUsername, trigger: 'blur' }],
-  name: [{ required: true, message: '请输入员工姓名', trigger: 'blur' }],
-  phone: [{ required: true, validator: validatePhone, trigger: 'blur' }],
-  idNumber: [{ required: true, validator: validateIdNumber, trigger: 'blur' }],
-}
+const items: FormItemOption[] = [
+  {
+    key: 'username',
+    label: '账号:',
+    required: true,
+    width: '293px',
+    maxlength: 20,
+    rule: { validator: validateUsername, trigger: 'blur' },
+  },
+  { key: 'name', label: '员工姓名:', required: true, width: '293px', maxlength: 12 },
+  {
+    key: 'phone',
+    label: '手机号:',
+    required: true,
+    width: '293px',
+    maxlength: 11,
+    rule: { validator: validatePhone, trigger: 'blur' },
+  },
+  {
+    key: 'sex',
+    label: '性别:',
+    type: 'radio',
+    options: [
+      { label: '男', value: '男' },
+      { label: '女', value: '女' },
+    ],
+  },
+  {
+    key: 'idNumber',
+    label: '身份证号:',
+    required: true,
+    width: '293px',
+    maxlength: 20,
+    rule: { validator: validateIdNumber, trigger: 'blur' },
+  },
+]
 
 const init = async () => {
   const id = route.query.id
@@ -158,8 +138,8 @@ onMounted(() => {
 })
 
 const submitForm = async (keepAdding: boolean) => {
-  const valid = await formRef.value?.validate().catch(() => null)
-  if (valid === null) return
+  const ok = await formRef.value?.validate()
+  if (!ok) return
 
   const params: EmployeeForm = {
     ...ruleForm,
@@ -175,6 +155,7 @@ const submitForm = async (keepAdding: boolean) => {
       ruleForm.phone = ''
       ruleForm.idNumber = ''
       ruleForm.sex = '男'
+      formRef.value?.restoreValidation()
       return
     }
     router.push('/employee')
@@ -192,14 +173,6 @@ const submitForm = async (keepAdding: boolean) => {
     background: #fff;
     padding: 30px;
     border-radius: 4px;
-  }
-
-  :deep(.n-form-item) {
-    margin-bottom: 29px;
-  }
-
-  :deep(.n-input) {
-    width: 293px;
   }
 
   .id-number {

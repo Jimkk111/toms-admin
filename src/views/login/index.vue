@@ -6,20 +6,22 @@
         alt=""
       />
       <div class="login-form">
-        <n-form
+        <div class="login-form-title">
+          <img
+            src="@/assets/login/icon_logo.png"
+            style="width: 149px; height: 38px"
+            alt="苍穹外卖"
+          />
+        </div>
+        <CommonForm
           ref="formRef"
           :model="loginForm"
-          :rules="loginRules"
+          :items="loginItems"
           :show-label="false"
+          label-width="0"
+          @enter="handleLogin"
         >
-          <div class="login-form-title">
-            <img
-              src="@/assets/login/icon_logo.png"
-              style="width: 149px; height: 38px"
-              alt="苍穹外卖"
-            />
-          </div>
-          <n-form-item path="username">
+          <template #username>
             <n-input
               v-model:value="loginForm.username"
               placeholder="账号"
@@ -30,8 +32,8 @@
                 <i class="iconfont icon-user" />
               </template>
             </n-input>
-          </n-form-item>
-          <n-form-item path="password">
+          </template>
+          <template #password>
             <n-input
               v-model:value="loginForm.password"
               type="password"
@@ -43,18 +45,18 @@
                 <i class="iconfont icon-lock" />
               </template>
             </n-input>
-          </n-form-item>
-          <n-button
-            type="primary"
-            block
-            class="login-btn"
-            :loading="loading"
-            attr-type="button"
-            @click="handleLogin"
-          >
-            {{ loading ? '登录中...' : '登录' }}
-          </n-button>
-        </n-form>
+          </template>
+        </CommonForm>
+        <n-button
+          type="primary"
+          block
+          class="login-btn"
+          :loading="loading"
+          attr-type="button"
+          @click="handleLogin"
+        >
+          {{ loading ? '登录中...' : '登录' }}
+        </n-button>
       </div>
     </div>
   </div>
@@ -63,37 +65,45 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import type { FormInst, FormItemRule } from 'naive-ui'
 import { useUserStore } from '@/stores/user'
+import CommonForm from '@/components/Common/CommonForm.vue'
+import type { FormItemOption } from '@/types/form'
 
 defineOptions({ name: 'Login' })
 
 const router = useRouter()
 const userStore = useUserStore()
 
-const formRef = ref<FormInst | null>(null)
+const formRef = ref<InstanceType<typeof CommonForm> | null>(null)
 const loading = ref(false)
 const loginForm = reactive({
   username: 'admin',
   password: '123456',
 })
 
-const loginRules: Record<string, FormItemRule[]> = {
-  username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
-  password: [
-    {
+const loginItems: FormItemOption[] = [
+  {
+    key: 'username',
+    label: '',
+    rule: { required: true, message: '请输入用户名', trigger: 'blur' },
+  },
+  {
+    key: 'password',
+    label: '',
+    rule: {
       validator: (_rule, value: string) =>
         value.length < 6 ? new Error('密码必须在6位以上') : true,
       trigger: 'blur',
     },
-  ],
-}
+  },
+]
 
 const handleLogin = (e?: MouseEvent | KeyboardEvent) => {
   e?.preventDefault()
   formRef.value
     ?.validate()
-    .then(async () => {
+    .then(async (valid) => {
+      if (!valid) return
       loading.value = true
       try {
         const res = await userStore.login(loginForm)
@@ -134,12 +144,12 @@ const handleLogin = (e?: MouseEvent | KeyboardEvent) => {
   width: 40%;
   border-radius: 0 8px 8px 0;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
 
   .n-form {
     width: 214px;
-    height: 307px;
   }
 
   .n-form-item {

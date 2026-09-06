@@ -6,44 +6,12 @@
     style="width: 568px"
     @update:show="handleClose"
   >
-    <n-form
+    <CommonForm
       ref="formRef"
       :model="form"
-      :rules="rules"
-      label-placement="left"
+      :items="items"
       label-width="85"
-    >
-      <n-form-item
-        label="原始密码："
-        path="oldPassword"
-      >
-        <n-input
-          v-model:value="form.oldPassword"
-          type="password"
-          placeholder="请输入"
-        />
-      </n-form-item>
-      <n-form-item
-        label="新密码："
-        path="newPassword"
-      >
-        <n-input
-          v-model:value="form.newPassword"
-          type="password"
-          placeholder="6 - 20位密码，数字或字母，区分大小写"
-        />
-      </n-form-item>
-      <n-form-item
-        label="确认密码："
-        path="affirmPassword"
-      >
-        <n-input
-          v-model:value="form.affirmPassword"
-          type="password"
-          placeholder="请输入"
-        />
-      </n-form-item>
-    </n-form>
+    />
     <template #footer>
       <div class="modal-footer">
         <n-button @click="handleClose(false)">取 消</n-button>
@@ -59,16 +27,18 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
-import type { FormInst, FormItemRule } from 'naive-ui'
+import { reactive, ref, watch } from 'vue'
+import type { FormItemRule } from 'naive-ui'
 import { editPassword } from '@/api/users'
 import { message } from '@/utils/feedback'
+import CommonForm from '@/components/Common/CommonForm.vue'
+import type { FormItemOption } from '@/types/form'
 
 defineOptions({ name: 'PasswordModal' })
 
 const show = defineModel<boolean>('show', { default: false })
 
-const formRef = ref<FormInst | null>(null)
+const formRef = ref<InstanceType<typeof CommonForm> | null>(null)
 const form = reactive({
   oldPassword: '',
   newPassword: '',
@@ -88,11 +58,23 @@ const validatePass2 = (_rule: FormItemRule, value: string) => {
   return true
 }
 
-const rules: Record<string, FormItemRule[]> = {
-  oldPassword: [{ validator: validatePwd, trigger: 'blur' }],
-  newPassword: [{ validator: validatePwd, trigger: 'blur' }],
-  affirmPassword: [{ validator: validatePass2, trigger: 'blur' }],
-}
+const items: FormItemOption[] = [
+  { key: 'oldPassword', label: '原始密码：', type: 'password', required: true, rule: { validator: validatePwd, trigger: 'blur' } },
+  { key: 'newPassword', label: '新密码：', type: 'password', required: true, rule: { validator: validatePwd, trigger: 'blur' } },
+  { key: 'affirmPassword', label: '确认密码：', type: 'password', required: true, rule: { validator: validatePass2, trigger: 'blur' } },
+]
+
+watch(
+  () => show.value,
+  (val) => {
+    if (val) {
+      form.oldPassword = ''
+      form.newPassword = ''
+      form.affirmPassword = ''
+      formRef.value?.restoreValidation()
+    }
+  },
+)
 
 const handleClose = (visible: boolean) => {
   show.value = visible
@@ -106,7 +88,8 @@ const handleSave = (e: MouseEvent) => {
   e.preventDefault()
   formRef.value
     ?.validate()
-    .then(async () => {
+    .then(async (valid) => {
+      if (!valid) return
       await editPassword({
         oldPassword: form.oldPassword,
         newPassword: form.newPassword,

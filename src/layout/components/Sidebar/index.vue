@@ -45,6 +45,7 @@ const appStore = useAppStore()
 const collapsed = computed(() => !appStore.sidebarOpened)
 const activeKey = computed(() => route.path)
 
+// 菜单选项
 const menuOptions: MenuOption[] = (
   router.options.routes.find((r) => r.path === '/')?.children ?? []
 )
@@ -87,11 +88,11 @@ const handleSelect = (key: string) => {
 
     /* 两个状态各自固定尺寸，不做缩放动画 */
     .logo-full {
-      width: 110px;
+      width: 180px;
     }
 
     .logo-mini {
-      width: 32px;
+      width: 42px;
     }
   }
 

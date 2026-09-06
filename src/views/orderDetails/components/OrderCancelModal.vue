@@ -6,26 +6,11 @@
     style="width: 42%"
     @update:show="handleClose"
   >
-    <n-form label-placement="left" label-width="90">
-      <n-form-item :label="title + '原因：'">
-        <n-select
-          v-model:value="cancelReason"
-          :placeholder="'请选择' + title + '原因'"
-          :options="options"
-        />
-      </n-form-item>
-      <n-form-item
-        v-if="cancelReason === '自定义原因'"
-        label="原因："
-      >
-        <n-input
-          v-model:value="remark"
-          type="textarea"
-          :placeholder="'请填写您' + title + '的原因（限20字内）'"
-          :maxlength="20"
-        />
-      </n-form-item>
-    </n-form>
+    <CommonForm
+      :model="form"
+      :items="items"
+      label-width="90"
+    />
     <template #footer>
       <div class="dialog-footer">
         <n-button @click="handleClose(false)">取 消</n-button>
@@ -41,8 +26,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, reactive, watch } from 'vue'
 import { message } from '@/utils/feedback'
+import CommonForm from '@/components/Common/CommonForm.vue'
+import type { FormItemOption } from '@/types/form'
 
 defineOptions({ name: 'OrderCancelModal' })
 
@@ -57,8 +44,10 @@ const emit = defineEmits<{
   confirm: [reason: string]
 }>()
 
-const cancelReason = ref('')
-const remark = ref('')
+const form = reactive({
+  cancelReason: '',
+  remark: '',
+})
 
 const cancelOrderReasonList = [
   '订单量较多，暂时无法接单',
@@ -82,31 +71,53 @@ const options = computed(() =>
   })),
 )
 
+const items = computed<FormItemOption[]>(() => [
+  {
+    key: 'cancelReason',
+    label: `${props.title}原因：`,
+    type: 'select',
+    options: options.value,
+    placeholder: `请选择${props.title}原因`,
+  },
+  ...(form.cancelReason === '自定义原因'
+    ? [
+        {
+          key: 'remark',
+          label: '原因：',
+          type: 'textarea' as const,
+          placeholder: `请填写您${props.title}的原因（限20字内）`,
+          maxlength: 20,
+          width: '100%',
+        },
+      ]
+    : []),
+])
+
 watch(
   () => props.show,
   (val) => {
     if (val) {
-      cancelReason.value = ''
-      remark.value = ''
+      form.cancelReason = ''
+      form.remark = ''
     }
   },
 )
 
 const handleClose = (visible: boolean) => {
   emit('update:show', visible)
-  if (!visible) cancelReason.value = ''
+  if (!visible) form.cancelReason = ''
 }
 
 const confirm = () => {
-  if (!cancelReason.value) {
+  if (!form.cancelReason) {
     message.error(`请选择${props.title}原因`)
     return
   }
-  if (cancelReason.value === '自定义原因' && !remark.value) {
+  if (form.cancelReason === '自定义原因' && !form.remark) {
     message.error(`请输入${props.title}原因`)
     return
   }
-  emit('confirm', cancelReason.value === '自定义原因' ? remark.value : cancelReason.value)
+  emit('confirm', form.cancelReason === '自定义原因' ? form.remark : form.cancelReason)
 }
 </script>
 

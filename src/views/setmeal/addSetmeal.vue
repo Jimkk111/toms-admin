@@ -5,51 +5,13 @@
       :goback="true"
     />
     <div class="container">
-      <n-form
+      <CommonForm
         ref="formRef"
         :model="ruleForm"
-        :rules="rules"
-        label-placement="left"
+        :items="items"
         label-width="180"
       >
-        <div class="form-row">
-          <n-form-item
-            label="套餐名称:"
-            path="name"
-          >
-            <n-input
-              v-model:value="ruleForm.name"
-              placeholder="请填写套餐名称"
-              :maxlength="14"
-            />
-          </n-form-item>
-          <n-form-item
-            label="套餐分类:"
-            path="idType"
-          >
-            <n-select
-              v-model:value="ruleForm.idType"
-              placeholder="请选择套餐分类"
-              :options="setmealCategoryOptions"
-            />
-          </n-form-item>
-        </div>
-        <div class="form-row">
-          <n-form-item
-            label="套餐价格:"
-            path="price"
-          >
-            <n-input
-              v-model:value="ruleForm.price"
-              placeholder="请设置套餐价格"
-            />
-          </n-form-item>
-        </div>
-
-        <n-form-item
-          label="套餐菜品:"
-          :show-feedback="false"
-        >
+        <template #dishes>
           <div class="addDish">
             <span
               v-if="dishTable.length === 0"
@@ -76,50 +38,33 @@
               />
             </div>
           </div>
-        </n-form-item>
-
-        <n-form-item
-          label="套餐图片:"
-          path="image"
-        >
+        </template>
+        <template #image>
           <ImgUpload
             :prop-image-url="ruleForm.image"
             @image-change="imageChange"
           >
             图片大小不超过2M<br />仅能上传 PNG JPEG JPG类型图片<br />建议上传200*200或300*300尺寸的图片
           </ImgUpload>
-        </n-form-item>
+        </template>
+      </CommonForm>
 
-        <n-form-item
-          label="套餐描述:"
-          path="description"
+      <div class="sub-box">
+        <n-button @click="router.back()">取消</n-button>
+        <n-button
+          type="primary"
+          @click="submitForm(false)"
         >
-          <n-input
-            v-model:value="ruleForm.description"
-            type="textarea"
-            :rows="3"
-            maxlength="200"
-            placeholder="套餐描述，最长200字"
-          />
-        </n-form-item>
-
-        <div class="subBox">
-          <n-button @click="router.back()">取消</n-button>
-          <n-button
-            type="primary"
-            @click="submitForm(false)"
-          >
-            保存
-          </n-button>
-          <n-button
-            v-if="actionType === 'add'"
-            type="primary"
-            @click="submitForm(true)"
-          >
-            保存并继续添加
-          </n-button>
-        </div>
-      </n-form>
+          保存
+        </n-button>
+        <n-button
+          v-if="actionType === 'add'"
+          type="primary"
+          @click="submitForm(true)"
+        >
+          保存并继续添加
+        </n-button>
+      </div>
     </div>
 
     <!-- 添加菜品弹层 -->
@@ -162,14 +107,12 @@
 </template>
 
 <script setup lang="ts">
-import { h, onMounted, reactive, ref } from 'vue'
+import { computed, h, onMounted, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import {
   NButton,
   NInputNumber,
   type DataTableColumns,
-  type FormInst,
-  type FormItemRule,
   type SelectOption,
 } from 'naive-ui'
 import { querySetmealById, addSetmeal, editSetmeal } from '@/api/setMeal'
@@ -178,6 +121,9 @@ import { getCategoryList } from '@/api/dish'
 import { message } from '@/utils/feedback'
 import HeadLable from '@/components/HeadLable/index.vue'
 import ImgUpload from '@/components/ImgUpload/index.vue'
+import DataTable from '@/components/Common/DataTable.vue'
+import CommonForm from '@/components/Common/CommonForm.vue'
+import type { FormItemOption } from '@/types/form'
 import AddDish from './components/AddDish.vue'
 
 defineOptions({ name: 'AddSetmeal' })
@@ -185,7 +131,7 @@ defineOptions({ name: 'AddSetmeal' })
 const router = useRouter()
 const route = useRoute()
 
-const formRef = ref<FormInst | null>(null)
+const formRef = ref<InstanceType<typeof CommonForm> | null>(null)
 const actionType = ref<'add' | 'edit'>('add')
 const title = ref('添加套餐')
 
@@ -202,7 +148,7 @@ const checkList = ref<SetmealDish[]>([])
 const statusValue = ref(1)
 const setmealCategoryOptions = ref<SelectOption[]>([])
 
-const validateName = (_rule: FormItemRule, value: string) => {
+const validateName = (_rule: unknown, value: string) => {
   if (!value) return new Error('请输入套餐名称')
   if (!/^([A-Za-z0-9\u4e00-\u9fa5]){2,20}$/.test(value)) {
     return new Error('套餐名称输入不符，请输入2-20个字符')
@@ -210,7 +156,7 @@ const validateName = (_rule: FormItemRule, value: string) => {
   return true
 }
 
-const validatePrice = (_rule: FormItemRule, value: string) => {
+const validatePrice = (_rule: unknown, value: string) => {
   const reg = /^([1-9]\d{0,5}|0)(\.\d{1,2})?$/
   if (!reg.test(value) || Number(value) <= 0) {
     return new Error('套餐价格格式有误，请输入大于零且最多保留两位小数的金额')
@@ -218,11 +164,46 @@ const validatePrice = (_rule: FormItemRule, value: string) => {
   return true
 }
 
-const rules: Record<string, FormItemRule[]> = {
-  name: [{ required: true, validator: validateName, trigger: 'blur' }],
-  idType: [{ required: true, message: '请选择套餐分类', trigger: 'change' }],
-  price: [{ required: true, validator: validatePrice, trigger: 'blur' }],
-}
+const validateImage = () =>
+  ruleForm.image ? true : new Error('套餐图片不能为空')
+
+const items = computed<FormItemOption[]>(() => [
+  {
+    key: 'name',
+    label: '套餐名称:',
+    required: true,
+    width: '350px',
+    maxlength: 14,
+    rule: { validator: validateName, trigger: 'blur' },
+  },
+  {
+    key: 'idType',
+    label: '套餐分类:',
+    type: 'select',
+    options: setmealCategoryOptions.value,
+    required: true,
+    width: '350px',
+    rule: { required: true, message: '请选择套餐分类', trigger: 'change' },
+  },
+  {
+    key: 'price',
+    label: '套餐价格:',
+    required: true,
+    width: '350px',
+    rule: { validator: validatePrice, trigger: 'blur' },
+  },
+  { key: 'dishes', label: '套餐菜品:' },
+  { key: 'image', label: '套餐图片:', rule: { validator: validateImage } },
+  {
+    key: 'description',
+    label: '套餐描述:',
+    type: 'textarea',
+    rows: 3,
+    maxlength: 200,
+    width: '777px',
+    placeholder: '套餐描述，最长200字',
+  },
+])
 
 const dishColumns: DataTableColumns<SetmealDish> = [
   { title: '名称', key: 'name', width: 180, align: 'center' },
@@ -341,14 +322,10 @@ const delDishHandle = (index: number) => {
 }
 
 const submitForm = async (keepAdding: boolean) => {
-  const valid = await formRef.value?.validate().catch(() => null)
-  if (valid === null) return
+  const ok = await formRef.value?.validate()
+  if (!ok) return
   if (dishTable.value.length === 0) {
     message.error('套餐下菜品不能为空')
-    return
-  }
-  if (!ruleForm.image) {
-    message.error('套餐图片不能为空')
     return
   }
 
@@ -381,6 +358,7 @@ const submitForm = async (keepAdding: boolean) => {
       ruleForm.image = ''
       ruleForm.description = ''
       dishTable.value = []
+      formRef.value?.restoreValidation()
       return
     }
     router.push('/setmeal')
@@ -401,25 +379,6 @@ const submitForm = async (keepAdding: boolean) => {
     min-height: 500px;
   }
 
-  .form-row {
-    display: flex;
-    flex-wrap: wrap;
-  }
-
-  :deep(.n-input),
-  :deep(.n-base-selection) {
-    width: 350px;
-  }
-
-  .subBox {
-    padding-top: 30px;
-    text-align: center;
-    border-top: solid 1px $gray-5;
-    display: flex;
-    justify-content: center;
-    gap: 14px;
-  }
-
   .addDish {
     width: 777px;
 
@@ -438,6 +397,15 @@ const submitForm = async (keepAdding: boolean) => {
   .search-dish {
     width: 293px;
     margin-bottom: 10px;
+  }
+
+  .sub-box {
+    padding-top: 30px;
+    text-align: center;
+    border-top: solid 1px $gray-5;
+    display: flex;
+    justify-content: center;
+    gap: 14px;
   }
 }
 
