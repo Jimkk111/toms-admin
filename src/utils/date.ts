@@ -1,5 +1,7 @@
 import dayjs from 'dayjs'
 
+// dayjs日期处理库
+
 const DATE = 'YYYY-MM-DD'
 
 /** 昨日、今日（展示用 yyyy.mm.dd） */

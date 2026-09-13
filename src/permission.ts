@@ -5,6 +5,7 @@ import { getUserInfo } from '@/utils/cookies'
 
 NProgress.configure({ showSpinner: false })
 
+// 路由守卫
 router.beforeEach((to, _from, next) => {
   NProgress.start()
   // JWT 由后端 Set-Cookie 写入（HttpOnly，JS 无法读取），浏览器请求时自动携带；
@@ -18,5 +19,6 @@ router.beforeEach((to, _from, next) => {
 
 router.afterEach((to) => {
   NProgress.done()
+  // 设置页面标题，若路由未配置 title，则使用默认标题
   document.title = to.meta.title ?? '苍穹外卖'
 })
