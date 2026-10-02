@@ -3,20 +3,6 @@
     class="sidebar"
     :class="{ collapsed }"
   >
-    <div class="logo">
-      <img
-        v-if="!collapsed"
-        class="logo-full"
-        src="@/assets/login/icon_logo.png"
-        alt="苍穹外卖"
-      />
-      <img
-        v-else
-        class="logo-mini"
-        src="@/assets/login/mini-logo.png"
-        alt="苍穹外卖"
-      />
-    </div>
     <n-scrollbar class="menu-scroll">
       <n-menu
         :value="activeKey"
@@ -77,25 +63,6 @@ const handleSelect = (key: string) => {
     width: 64px;
   }
 
-  .logo {
-    flex-shrink: 0;
-    text-align: center;
-    background-color: #ffc100;
-    height: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    /* 两个状态各自固定尺寸，不做缩放动画 */
-    .logo-full {
-      width: 180px;
-    }
-
-    .logo-mini {
-      width: 42px;
-    }
-  }
-
   .menu-scroll {
     flex: 1;
     min-height: 0;
@@ -106,10 +73,10 @@ const handleSelect = (key: string) => {
   }
 
   :deep(.n-menu.inverted .n-menu-item-content--selected) {
-    color: #ffc200;
+    color: #4FACE6;
 
     .iconfont {
-      color: #ffc200;
+      color: #4FACE6;
     }
   }
 }

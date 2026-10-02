@@ -8,10 +8,11 @@
       <div class="login-form">
         <div class="login-form-title">
           <img
-            src="@/assets/login/icon_logo.png"
-            style="width: 149px; height: 38px"
-            alt="苍穹外卖"
+            class="logo-img"
+            src="@/assets/logo.png"
+            alt="外卖管理系统"
           />
+          <span>外卖管理系统</span>
         </div>
         <CommonForm
           ref="formRef"
@@ -49,7 +50,6 @@
         </CommonForm>
         <n-button
           type="primary"
-          block
           class="login-btn"
           :loading="loading"
           attr-type="button"
@@ -175,25 +175,37 @@ const handleLogin = (e?: MouseEvent | KeyboardEvent) => {
 }
 
 .login-form-title {
-  height: 36px;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  margin-bottom: 40px;
+  margin-bottom: 36px;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  color: #333333;
+  user-select: none;
+
+  .logo-img {
+    width: 64px;
+    height: 64px;
+    margin-bottom: 10px;
+  }
 }
 
 .login-btn {
+  width: 214px;
   border-radius: 17px;
   margin-top: 10px;
   font-weight: 500;
   font-size: 12px;
-  color: #333333;
-  background-color: #ffc200;
+  color: #ffffff;
+  background-color: #289ADD;
 
   &:hover,
   &:focus {
-    background-color: #ffc200;
-    color: #333333;
+    background-color: #1C7FBE;
+    color: #ffffff;
   }
 }
 </style>

@@ -1,6 +1,6 @@
 <template>
   <section class="app-main">
-    <!-- ×÷ÓÃÓò²å²Û -->
+    <!-- ä½œç”¨åŸŸæ’æ§½ -->
     <router-view v-slot="{ Component }">
       <transition name="fade-transform" mode="out-in">
         <component :is="Component" />

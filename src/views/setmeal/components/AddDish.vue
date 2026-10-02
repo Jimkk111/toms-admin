@@ -205,9 +205,9 @@ onMounted(async () => {
         font-size: 12px;
 
         &.act {
-          background: #ffc200;
-          color: #333;
-          border-color: #ffc200;
+          background: #289ADD;
+          color: #ffffff;
+          border-color: #289ADD;
         }
       }
     }

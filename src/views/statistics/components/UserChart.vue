@@ -47,7 +47,7 @@ const option = computed<EChartsOption | null>(() => {
         smooth: false,
         showSymbol: false,
         symbolSize: 10,
-        itemStyle: { color: '#F29C1B', borderColor: '#FFC100', borderWidth: 2 },
+        itemStyle: { color: '#F49F22', borderColor: '#FDC46A', borderWidth: 2 },
         lineStyle: { color: '#FFD000' },
         data: props.userdata.totalUserList,
       },

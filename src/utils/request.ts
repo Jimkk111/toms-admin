@@ -17,7 +17,7 @@ const getRequestKey = (config: AxiosRequestConfig) =>
 const service = axios.create({
   baseURL: import.meta.env.VITE_BASE_API,
   timeout: 600000,
-  // 登录态由后端通过 Set-Cookie 下发的 JWT（sky_admin_token）承载，请求需携带 cookie
+  // 登录态由后端通过 Set-Cookie 下发的 JWT 承载，请求需携带 cookie
   // 表示跨域时允许携带Cookies等凭证
   withCredentials: true,
 })

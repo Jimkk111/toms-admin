@@ -36,7 +36,7 @@ const option = computed<EChartsOption | null>(() => {
         name: '销量',
         type: 'bar',
         barWidth: '40%',
-        itemStyle: { color: '#FFC200', borderRadius: [0, 4, 4, 0] },
+        itemStyle: { color: '#289ADD', borderRadius: [0, 4, 4, 0] },
         data: props.top10data.numberList,
       },
     ],

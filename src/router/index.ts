@@ -14,12 +14,12 @@ export const constantRoutes: RouteRecordRaw[] = [
   {
     path: '/login',
     component: () => import('@/views/login/index.vue'),
-    meta: { title: '苍穹外卖', hidden: true, notNeedAuth: true },
+    meta: { title: '外卖管理系统', hidden: true, notNeedAuth: true },
   },
   {
     path: '/404',
     component: () => import('@/views/404.vue'),
-    meta: { title: '苍穹外卖', hidden: true, notNeedAuth: true },
+    meta: { title: '外卖管理系统', hidden: true, notNeedAuth: true },
   },
   {
     path: '/',

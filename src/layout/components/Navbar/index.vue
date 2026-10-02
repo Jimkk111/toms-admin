@@ -1,6 +1,14 @@
 <template>
   <div class="navbar">
     <div class="left">
+      <div class="brand">
+        <img
+          class="logo-img"
+          src="@/assets/logo.png"
+          alt="外卖管理系统"
+        />
+        <span class="brand-name">外卖管理系统</span>
+      </div>
       <Hamburger
         :is-active="appStore.sidebarOpened"
         class="hamburger-container"
@@ -191,7 +199,7 @@ onBeforeUnmount(closeSocket)
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #ffc100;
+  background: #289ADD;
   padding-right: 20px;
 
   .left {
@@ -199,15 +207,40 @@ onBeforeUnmount(closeSocket)
     align-items: center;
     height: 100%;
 
+    // 品牌区固定在顶栏最左侧，不随侧边栏收起变化
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-left: 20px;
+
+      // logo 为白底方图，用白色圆底衬避免在黄色条上露白边
+      .logo-img {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: #ffffff;
+      }
+
+      .brand-name {
+        font-size: 16px;
+        font-weight: 600;
+        color: #ffffff;
+        letter-spacing: 1px;
+        white-space: nowrap;
+        user-select: none;
+      }
+    }
+
     .hamburger-container {
-      padding: 0 12px 0 20px;
+      padding: 0 12px;
       cursor: pointer;
       height: 100%;
       display: flex;
       align-items: center;
 
       &:hover {
-        background: rgba(0, 0, 0, 0.025);
+        background: rgba(255, 255, 255, 0.15);
       }
     }
   }
@@ -231,7 +264,7 @@ onBeforeUnmount(closeSocket)
   .right {
     display: flex;
     align-items: center;
-    color: #333333;
+    color: #ffffff;
     font-size: 14px;
 
     .navicon {
@@ -242,7 +275,7 @@ onBeforeUnmount(closeSocket)
       height: 32px;
 
       &:hover {
-        background: rgba(255, 255, 255, 0.52);
+        background: rgba(255, 255, 255, 0.2);
       }
 
       img {
@@ -257,8 +290,8 @@ onBeforeUnmount(closeSocket)
       width: 120px;
       justify-content: flex-start;
       text-align: left;
-      background: rgba(255, 255, 255, 0.52);
-      color: #333;
+      background: rgba(255, 255, 255, 0.2);
+      color: #fff;
 
       .arrow {
         width: 8px;

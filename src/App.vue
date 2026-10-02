@@ -13,13 +13,13 @@
 <script setup lang="ts">
 import type { GlobalThemeOverrides } from 'naive-ui'
 
-// 品牌主色：苍穹外卖黄
+// 品牌主色：主题黄
 const themeOverrides: GlobalThemeOverrides = {
   common: {
-    primaryColor: '#ffc200',
-    primaryColorHover: '#ffd15c',
-    primaryColorPressed: '#e6ae00',
-    primaryColorSuppl: '#ffc200',
+    primaryColor: '#289ADD',
+    primaryColorHover: '#4FACE6',
+    primaryColorPressed: '#1C7FBE',
+    primaryColorSuppl: '#289ADD',
   },
 }
 </script>

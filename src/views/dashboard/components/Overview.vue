@@ -22,7 +22,7 @@
         </li>
         <li>
           <p class="tit">平均客单价</p>
-          <p class="num">¥ {{ overviewData.unitPrice }}</p>
+          <p class="num">¥ {{ unitPrice }}</p>
         </li>
         <li>
           <p class="tit">新增用户</p>
@@ -45,5 +45,12 @@ const rate = computed(() =>
   props.overviewData.orderCompletionRate
     ? `${(props.overviewData.orderCompletionRate * 100).toFixed(0)}%`
     : '0%',
+)
+
+// 后端返回的均价可能是长小数，统一保留两位
+const unitPrice = computed(() =>
+  props.overviewData.unitPrice != null
+    ? Number(props.overviewData.unitPrice).toFixed(2)
+    : '0.00',
 )
 </script>

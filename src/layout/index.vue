@@ -1,9 +1,10 @@
 <template>
   <div class="app-wrapper">
-    <Sidebar class="sidebar-container" />
-    <div class="main-container">
-      <Navbar />
-      <AppMain />
+    <!-- 顶栏全宽固定，不随侧边栏收起而移动 -->
+    <Navbar class="navbar-container" />
+    <div class="body-container">
+      <Sidebar class="sidebar-container" />
+      <AppMain class="main-container" />
     </div>
   </div>
 </template>
@@ -17,11 +18,22 @@ import AppMain from './components/AppMain.vue'
 <style lang="scss" scoped>
 .app-wrapper {
   display: flex;
+  flex-direction: column;
   height: 100vh;
   width: 100%;
   min-width: 1366px;
   overflow: hidden;
   background: #f3f4f7;
+}
+
+.navbar-container {
+  flex-shrink: 0;
+}
+
+.body-container {
+  flex: 1;
+  display: flex;
+  min-height: 0;
 }
 
 .sidebar-container {
@@ -31,8 +43,6 @@ import AppMain from './components/AppMain.vue'
 
 .main-container {
   flex: 1;
-  display: flex;
-  flex-direction: column;
   min-width: 0;
 }
 </style>

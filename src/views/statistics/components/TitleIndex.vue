@@ -96,7 +96,8 @@ void props
       color: #333;
 
       &.active {
-        background: #ffc200;
+        background: #289ADD;
+        color: #ffffff;
         font-weight: 700;
       }
     }

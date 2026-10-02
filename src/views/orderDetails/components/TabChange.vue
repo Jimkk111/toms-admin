@@ -78,7 +78,8 @@ const tabChange = (status: number) => {
   }
 
   .active {
-    background-color: #ffc200;
+    background-color: #289ADD;
+    color: #ffffff;
     font-weight: bold;
   }
 

@@ -332,13 +332,13 @@ const submitForm = async (keepAdding: boolean) => {
   width: 777px;
 
   .addBut {
-    background: #ffc200;
+    background: #289ADD;
     display: inline-block;
     padding: 0 20px;
     border-radius: 4px;
     line-height: 40px;
     cursor: pointer;
-    color: #333333;
+    color: #ffffff;
     font-weight: 500;
   }
 
@@ -375,11 +375,11 @@ const submitForm = async (keepAdding: boolean) => {
 
         span {
           display: inline-block;
-          color: #ffc200;
+          color: #289ADD;
           margin: 5px;
           line-height: 26px;
           padding: 0 10px;
-          background: #fffbf0;
+          background: #eaf6fd;
           border: 1px solid #fbe396;
           border-radius: 4px;
           font-size: 12px;

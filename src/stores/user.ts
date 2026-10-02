@@ -23,7 +23,7 @@ export const useUserStore = defineStore('user', () => {
     const trimmed = form.username.trim()
     const { data } = await loginApi({ ...form, username: trimmed })
     if (String(data.code) === '1') {
-      // JWT 由后端通过 Set-Cookie(sky_admin_token) 下发给浏览器，前端不接触 token 本身，
+      // JWT 由后端通过 Set-Cookie 下发给浏览器，前端不接触 token 本身，
       // 仅保留用户信息 cookie 作为客户端登录态标记（路由守卫依赖它）
       userInfo.value = data.data
       username.value = trimmed
@@ -37,7 +37,7 @@ export const useUserStore = defineStore('user', () => {
   }
 
   async function logout() {
-    // 后端登出接口通过 Set-Cookie: sky_admin_token=; Max-Age=0 清除 JWT cookie
+    // 后端登出接口通过 Set-Cookie 清除 JWT cookie
     try {
       await logoutApi()
     } finally {

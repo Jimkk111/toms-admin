@@ -279,7 +279,8 @@ const confirmCancel = async (reason: string) => {
       font-weight: 400;
 
       &.active {
-        background: #ffc200;
+        background: #289ADD;
+        color: #ffffff;
         border-radius: 4px;
         font-weight: 700;
       }

@@ -20,5 +20,5 @@ router.beforeEach((to, _from, next) => {
 router.afterEach((to) => {
   NProgress.done()
   // 设置页面标题，若路由未配置 title，则使用默认标题
-  document.title = to.meta.title ?? '苍穹外卖'
+  document.title = to.meta.title ?? '外卖管理系统'
 })
