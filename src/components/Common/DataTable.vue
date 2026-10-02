@@ -13,6 +13,7 @@
       :key="name"
       #[name]="slotProps"
     >
+    <!-- 这是页面传给DataTable的内容 -->
       <slot
         :name="name"
         v-bind="slotProps ?? {}"

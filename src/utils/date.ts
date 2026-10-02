@@ -1,6 +1,7 @@
 import dayjs from 'dayjs'
 
 // dayjs日期处理库
+// dayjs()获取当前时间
 
 const DATE = 'YYYY-MM-DD'
 
